@@ -1,0 +1,9 @@
+{
+  "masterVolume": 80,
+  "bgmVolume": 70,
+  "sfxVolume": 85,
+  "sfxEnabled": true,
+  "bgmEnabled": true,
+  "particlesEnabled": true,
+  "difficulty": "Normal"
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "save-1",
+    "slotName": "Vault of Antiquity",
+    "timestamp": "8/16/2026, 1:31:52 PM",
+    "level": 3,
+    "score": 4250,
+    "glyphsCount": 18,
+    "playTimeSeconds": 840,
+    "difficulty": "Normal"
+  },
+  {
+    "id": "save-2",
+    "slotName": "Astral Sanctum",
+    "timestamp": "8/18/2026, 8:31:53 AM",
+    "level": 7,
+    "score": 12890,
+    "glyphsCount": 45,
+    "playTimeSeconds": 2150,
+    "difficulty": "Glyphmaster"
+  }
+]
