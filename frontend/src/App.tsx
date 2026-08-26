@@ -9,11 +9,11 @@ export const App: React.FC = () => {
   const activeScreen = useGameStore((state) => state.activeScreen);
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#0d0805]">
-      {/* 1. Transparent Phaser 3 Canvas Background */}
+    <div className="app-container">
+      {/* Transparent Phaser 3 Canvas Background */}
       <PhaserCanvas />
 
-      {/* 2. React UI Floating Overlays */}
+      {/* React UI Floating Overlays */}
       {activeScreen === 'MAIN_MENU' && <MainMenuUi />}
       {activeScreen === 'SETTINGS' && <SettingsModal />}
       {(activeScreen === 'IN_GAME' || activeScreen === 'PAUSED') && <GameSceneUi />}

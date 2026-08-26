@@ -1,64 +1,207 @@
-import React from 'react';
-import { Pause, Play, Home } from 'lucide-react';
-import { useGameStore } from '../lib/store';
+import React, { useMemo, useEffect } from 'react';
+import { PauseIcon, PlayIcon, HouseIcon, Icon, PenIcon, EraserIcon, ArrowArcLeftIcon, ArrowArcRightIcon, ArrowElbowRightDownIcon } from '@phosphor-icons/react';
+import { useGameStore, useWorkShopStore } from '../lib/store';
+import { Sigil } from '../lib/types/glyph_types';
+import { tier1Sigils } from '../lib/sigils';
+
+interface toolBarItemRef {
+  icon: Icon;
+  name: string;
+  position: number;
+  keybind?: string;
+}
+
+const toolBar: Array<toolBarItemRef> = [
+  { icon: PenIcon, name: "Pen", position: 1, keybind: "d" },
+  { icon: EraserIcon, name: "Eraser", position: 2, keybind: "e" },
+  { icon: ArrowArcLeftIcon, name: "Undo", position: 3, keybind: "ctrl+z" },
+  { icon: ArrowArcLeftIcon, name: "Redo", position: 4, keybind: "ctrl+shift+z" },
+];
+
+interface TooltipProps {
+  name: string;
+  keybind?: string;
+  children: React.ReactNode;
+}
+
+export const Tooltip: React.FC<TooltipProps> = ({ name, keybind, children }) => {
+  return (
+    <div className="tooltip-wrapper">
+      {children}
+      <div className="tooltip-bubble" role="tooltip">
+        <span className="tooltip-name">{name}</span>
+        {keybind && <span className="tooltip-keybind">({keybind})</span>}
+      </div>
+    </div>
+  );
+};
+
+const WorkshopCatelogMenu = ({ menuSigils }: { menuSigils: Record<string, Record<string, Sigil[]>> }) => {
+  return (
+    <div className="catelog-area">
+      <div className="catelog-header">
+        <h2 className='catelog-title'>Catelog</h2>
+      </div>
+      <div className="catelog-content">
+        <h3 className='catelog-subtitle'>Sigils</h3>
+        {Object.keys(menuSigils).map((type) =>
+          <div key={type} className='catelog-entry'>
+            <h3 className='catelog-entry-title'>{type}</h3>
+            <div>
+              {Object.keys(menuSigils[type]).map((tier) => (
+                <div className='sigil-tier-group' key={tier}>
+                  <h4>{tier}</h4>
+                  <div className='sigil-catelog'>
+                    {menuSigils[type][tier].map((sigil) => (
+                      <div key={sigil.id} className='sigil-items'>
+                        <img src={sigil.svgPath} alt={sigil.label} />
+                      </div>
+                    ))}</div>
+                </div>
+              ))}
+            </div>
+
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export const GameSceneUi: React.FC = () => {
+  const selectedTool = useWorkShopStore((state) => state.selectedTool);
+  const setSelectedTool = useWorkShopStore((state) => state.setSelectedTool);
+  const undo = useWorkShopStore((state) => state.undo);
+  const redo = useWorkShopStore((state) => state.redo);
   const activeScreen = useGameStore((state) => state.activeScreen);
   const setScreen = useGameStore((state) => state.setScreen);
   const resetGameSession = useGameStore((state) => state.resetGameSession);
 
+  const menuSigils = useMemo(() => {
+    const grouped: Record<string, Record<string, Sigil[]>> = {};
+    tier1Sigils.forEach((sigil: Sigil) => {
+      const type = sigil.type;
+      const tierKey = `tier-${sigil.tier ?? 1}`;
+      if (!grouped[type]) {
+        grouped[type] = {};
+      }
+      if (!grouped[type][tierKey]) {
+        grouped[type][tierKey] = [];
+      }
+      grouped[type][tierKey].push(sigil);
+    });
+    return grouped;
+  }, []);
+
   const isPaused = activeScreen === 'PAUSED';
 
+  // Handle Tool & Action Clicks
+  const handleToolChange = (toolName: string) => {
+    const norm = toolName.toLowerCase();
+    if (norm === 'undo') {
+      undo();
+    } else if (norm === 'redo') {
+      redo();
+    } else {
+      setSelectedTool(norm);
+    }
+  };
+
+  // Keyboard Shortcuts Listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      const isCtrlOrCmd = e.ctrlKey || e.metaKey;
+      const key = e.key.toLowerCase();
+
+      if (isCtrlOrCmd && key === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
+      } else if (isCtrlOrCmd && key === 'y') {
+        e.preventDefault();
+        redo();
+      } else if (key === 'd') {
+        setSelectedTool('pen');
+      } else if (key === 'e') {
+        setSelectedTool('eraser');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [setSelectedTool, undo, redo]);
+
   return (
-    <div className="ui-overlay-container flex flex-col justify-between p-6">
+    <div className="game-scene-overlay">
       {/* Top Header */}
-      <header className="flex justify-between items-center w-full max-w-6xl mx-auto interactive-ui">
-        <div className="flex items-center gap-3 px-5 py-3 rounded-2xl book-panel border border-[#a88344]/40">
+      <header className="game-header interactive-ui">
+        <div className="game-header-info">
           <div>
-            <span className="font-cinzel font-bold text-sm text-[#f5e5ab]">GAME SCENE</span>
-            <p className="text-[10px] text-[#b89f7d]">Canvas Arena</p>
+            <h4 style={{ color: 'var(--color-text-primary)' }}>WORKSHOP</h4>
           </div>
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={resetGameSession}
-            className="flex items-center gap-2 px-4 py-3 rounded-2xl book-panel border border-[#a88344]/50 hover:border-[#d4af37] text-[#e5c158] hover:text-[#ffffff] transition-all cursor-pointer font-cinzel font-bold text-xs"
-          >
-            <Home className="w-4 h-4" />
-            Main Menu
+        <div className="game-header-actions">
+          <button onClick={resetGameSession} className="btn btn-ghost btn-icon">
+            <HouseIcon size={20} />
           </button>
           <button
             onClick={() => setScreen(isPaused ? 'IN_GAME' : 'PAUSED')}
-            className="p-3.5 rounded-2xl book-panel border border-[#a88344]/50 hover:border-[#d4af37] text-[#e5c158] hover:text-[#ffffff] transition-all cursor-pointer shadow-lg"
+            className="btn btn-ghost btn-icon"
           >
-            {isPaused ? <Play className="w-5 h-5 fill-current" /> : <Pause className="w-5 h-5" />}
+            {isPaused ? <PlayIcon size={20} weight="fill" /> : <PauseIcon size={20} />}
           </button>
         </div>
       </header>
 
+      <div className='game-scene-content'>
+        <WorkshopCatelogMenu menuSigils={menuSigils} />
+
+        <div className='drawing-area'>
+          <div className='tool-box'>
+            {toolBar.map((tool) => {
+              const isSelected = selectedTool.toLowerCase() === tool.name.toLowerCase();
+              return (
+                <Tooltip key={tool.name} name={tool.name} keybind={tool.keybind}>
+                  <button
+                    className={`tool-bar-item ${isSelected ? 'selected' : ''}`}
+                    onClick={() => handleToolChange(tool.name)}
+                    aria-label={`${tool.name} (${tool.keybind})`}
+                  >
+                    {tool.name == "Redo" ? <tool.icon size={20} transform="rotate(180)" /> : <tool.icon size={20} />}
+                  </button>
+                </Tooltip>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
       {/* Pause Menu Overlay */}
       {isPaused && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0a0604]/85 backdrop-blur-md interactive-ui animate-fadeIn">
-          <div className="w-full max-w-md book-panel rounded-3xl p-8 border-2 border-[#a88344] text-center shadow-2xl space-y-6">
-            <div>
-              <h3 className="font-cinzel font-bold text-3xl text-[#f5e5ab]">GAME PAUSED</h3>
-            </div>
+        <div className="modal-overlay">
+          <div className="pause-modal">
+            <h3>GAME PAUSED</h3>
 
-            <div className="space-y-3">
+            <div className="pause-modal-actions">
               <button
                 onClick={() => setScreen('IN_GAME')}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#8b1a1a] to-[#521010] hover:from-[#a82222] hover:to-[#6b1717] text-[#f5e5ab] font-cinzel font-bold text-sm border border-[#a88344]/50 shadow-lg cursor-pointer"
+                className="btn btn-primary"
               >
                 Resume Game
               </button>
 
               <button
                 onClick={resetGameSession}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-[#140c07] border border-[#a88344]/30 hover:bg-[#211409] text-[#b89f7d] hover:text-[#f5e5ab] text-sm transition-colors cursor-pointer"
+                className="btn btn-secondary"
               >
-                <Home className="w-4 h-4" />
+                <HouseIcon size={16} />
                 Return to Main Menu
               </button>
             </div>
@@ -68,4 +211,3 @@ export const GameSceneUi: React.FC = () => {
     </div>
   );
 };
-

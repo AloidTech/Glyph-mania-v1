@@ -1,0 +1,110 @@
+/* ============================================
+   GLYPH MANIA - DESIGN VARIABLES & TOKENS
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap');
+
+:root {
+  /* Core Arcane Palette */
+  --color-bg: #12101a;
+  --color-surface: #1c1828;
+  --color-surface-raised: #211a30;
+  --color-surface-overlay: #251f35;
+  --color-muted: #1e1a2c;
+
+  /* Text Colors */
+  --color-text-primary: #e8dcc8;
+  --color-text-base: #e8dcc8;
+  --color-text-secondary: #c8b8d8;
+  --color-text-muted: #9d8fb5;
+  --color-text-dim: #7a6e90;
+  --color-text-accent: #c9a227;
+
+  /* Accent & Arcane Glow */
+  --color-accent: #c9a227;
+  --color-accent-hover: #e0b632;
+  --color-accent-muted: rgba(201, 162, 39, 0.18);
+  --color-accent-glow: rgba(201, 162, 39, 0.32);
+  --color-accent-glow-strong: rgba(201, 162, 39, 0.52);
+
+  /* Glassmorphism */
+  --color-glass: rgba(18, 16, 26, 0.72);
+  --color-glass-raised: rgba(28, 24, 40, 0.85);
+  --color-glass-border: rgba(201, 162, 39, 0.14);
+  --color-glass-border-strong: rgba(201, 162, 39, 0.38);
+
+  /* Borders & Highlights */
+  --color-border: rgba(201, 162, 39, 0.12);
+  --color-border-strong: rgba(201, 162, 39, 0.3);
+  --color-border-accent: #c9a227;
+  --color-destructive: #c0472b;
+  --color-destructive-glow: rgba(192, 71, 43, 0.4);
+
+  /* Interactive Elements */
+  --color-primary: #c9a227;
+  --color-primary-hover: #e0b632;
+  --switch-background: #3d3455;
+
+  /* Workshop & Drawing Area Palette */
+  --color-drawing-bg: #f4ede2;
+  --color-toolbar-bg: rgba(28, 24, 40, 0.88);
+  --color-toolbar-item-bg: #221c30;
+  --color-toolbar-item-hover: #352b4c;
+  --color-toolbar-item-active: #c9a227;
+  --color-toolbar-icon: #e8dcc8;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.75);
+  --shadow-panel: 0 8px 40px rgba(0, 0, 0, 0.65), 0 0 60px rgba(60, 20, 110, 0.12), inset 0 0 0 1px var(--color-glass-border);
+  --shadow-glow: 0 0 22px var(--color-accent-glow), 0 3px 10px rgba(0, 0, 0, 0.5);
+  --shadow-glow-hover: 0 0 38px var(--color-accent-glow-strong), 0 4px 16px rgba(0, 0, 0, 0.55);
+
+  /* Spacing Scale */
+  --space-xs: 0.375rem;
+  --space-sm: 0.75rem;
+  --space-md: 1.25rem;
+  --space-lg: 2rem;
+  --space-xl: 3.5rem;
+  --space-2xl: 4.5rem;
+  --space-3xl: 6rem;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  --font-heading: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  --font-body: 'Crimson Pro', 'Palatino Linotype', Georgia, serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Font Sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.2rem;
+  --text-xl: 1.4rem;
+  --text-2xl: 1.85rem;
+  --text-3xl: 2.35rem;
+  --text-4xl: 3rem;
+  --text-5xl: 3.75rem;
+  --text-6xl: 4.5rem;
+
+  /* Font Weights */
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-black: 900;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}

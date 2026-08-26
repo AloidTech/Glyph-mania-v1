@@ -1,0 +1,71 @@
+/* ============================================
+   GLYPH MANIA - BUTTON COMPONENTS
+   ============================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 0.75rem 1.75rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-heading);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--transition-base);
+  user-select: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #d4af37 0%, #aa820a 100%);
+  color: #12101a;
+  border-color: #e6c555;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.35);
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #e6c555 0%, #c49714 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+}
+
+.btn-secondary {
+  background: var(--color-glass);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-strong);
+  backdrop-filter: blur(8px);
+}
+
+.btn-secondary:hover {
+  background: var(--color-glass-raised);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-color: transparent;
+}
+
+.btn-ghost:hover {
+  background: rgba(201, 162, 39, 0.1);
+  color: var(--color-text-primary);
+}
+
+.btn-icon {
+  padding: 0.6rem;
+  border-radius: var(--radius-full);
+}
+
+.btn-icon-lg {
+  padding: 0.85rem;
+  border-radius: var(--radius-full);
+}

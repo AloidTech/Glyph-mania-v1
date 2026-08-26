@@ -51,7 +51,7 @@ export const PhaserCanvas: React.FC = () => {
     <div
       id="game-container"
       ref={containerRef}
-      className="fixed inset-0 w-full h-full z-0 bg-slate-950"
+      className="game-canvas-container"
     />
   );
 };

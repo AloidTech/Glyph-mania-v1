@@ -1,0 +1,149 @@
+/* ============================================
+   GLYPH MANIA - RESPONSIVE & MOBILE STYLES
+   ============================================ */
+
+/* ---------- Tablet & Small Laptops (<= 1024px) ---------- */
+@media (max-width: 1024px) {
+  .catelog-area {
+    width: 38%;
+  }
+
+  .main-menu-overlay {
+    padding: var(--space-lg);
+  }
+
+  .menu-hero h1 {
+    font-size: var(--text-4xl);
+  }
+}
+
+/* ---------- Mobile & Portrait Tablets (<= 768px) ---------- */
+@media (max-width: 768px) {
+  .game-scene-overlay {
+    padding: var(--space-sm);
+  }
+
+  .game-scene-content {
+    flex-direction: column-reverse;
+    margin-top: var(--space-sm);
+    gap: var(--space-sm);
+  }
+
+  /* Catalog Area stacks neatly at bottom on mobile */
+  .catelog-area {
+    width: 100%;
+    height: 180px;
+    margin-right: 0;
+    margin-top: var(--space-sm);
+    padding: var(--space-sm);
+    border-radius: var(--radius-lg);
+  }
+
+  .catelog-content {
+    flex-direction: row;
+    gap: var(--space-md);
+  }
+
+  .sigil-catelog {
+    flex-direction: row;
+    gap: var(--space-xs);
+  }
+
+  /* Drawing Area takes primary focus on mobile */
+  .drawing-area {
+    margin-left: 0;
+    width: 100%;
+    height: calc(100vh - 270px);
+    min-height: 320px;
+    border-radius: var(--radius-lg);
+  }
+
+  .drawing-area::before {
+    width: min(300px, 85%);
+  }
+
+  /* Tool-box switches to horizontal top-left layout on mobile */
+  .tool-box {
+    top: 10px;
+    left: 10px;
+    flex-direction: row;
+    padding: 6px;
+    gap: 6px;
+    border-radius: var(--radius-md);
+  }
+
+  .tool-bar-item {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Header adjustments for mobile */
+  .game-header {
+    padding: 0 var(--space-xs);
+  }
+
+  .game-header-info h4 {
+    font-size: var(--text-sm);
+  }
+
+  /* Tooltip adjustment on touch devices */
+  .tooltip-bubble {
+    left: 50%;
+    top: calc(100% + 8px);
+    transform: translateX(-50%) scale(0.92);
+  }
+
+  .tooltip-bubble::before {
+    right: auto;
+    left: 50%;
+    bottom: 100%;
+    top: auto;
+    transform: translateX(-50%);
+    border-color: transparent transparent var(--color-glass-border-strong) transparent;
+  }
+
+  .tooltip-wrapper:hover .tooltip-bubble {
+    transform: translateX(-50%) scale(1);
+  }
+
+  /* Main Menu mobile scaling */
+  .main-menu-overlay {
+    padding: var(--space-md);
+  }
+
+  .menu-hero {
+    margin-top: 0;
+  }
+
+  .menu-hero h1 {
+    font-size: var(--text-3xl);
+  }
+
+  .settings-modal,
+  .pause-modal {
+    max-width: 90vw;
+    padding: var(--space-md);
+  }
+}
+
+/* ---------- Small Mobile Phones (<= 480px) ---------- */
+@media (max-width: 480px) {
+  .catelog-area {
+    height: 140px;
+  }
+
+  .sigil-items {
+    width: 34px;
+    height: 34px;
+    padding: 4px;
+  }
+
+  .btn {
+    padding: 0.6rem 1.25rem;
+    font-size: var(--text-sm);
+  }
+
+  .menu-hero h1 {
+    font-size: var(--text-2xl);
+  }
+}

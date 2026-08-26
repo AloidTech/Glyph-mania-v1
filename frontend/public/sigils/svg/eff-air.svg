@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Left spiral -->
+  <path d="M 32 32 C 28 24, 18 22, 22 14 C 24 10, 30 12, 28 18 C 26 22, 22 18, 24 16" />
+  <!-- Right spiral -->
+  <path d="M 32 32 C 36 24, 46 22, 42 14 C 40 10, 34 12, 36 18 C 38 22, 42 18, 40 16" />
+  <!-- Bottom spiral -->
+  <path d="M 32 32 C 32 40, 26 44, 30 50 C 32 54, 38 52, 36 46 C 34 42, 30 46, 32 48" />
+</svg>

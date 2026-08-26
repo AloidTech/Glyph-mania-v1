@@ -5,23 +5,29 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "generate-atlas": "tsx scripts/generate-sigil-atlas.ts",
+    "build": "npm run generate-atlas && tsc && vite build",
+    "preview": "vite preview",
+    "db:types": "npx supabase gen types typescript --project-id <your-project-ref> > src/lib/types/database.types.ts"
   },
   "dependencies": {
-    "lucide-react": "^0.475.0",
+    "@phosphor-icons/react": "^2.1.10",
+    "@supabase/supabase-js": "^2.109.0",
     "phaser": "^3.88.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-icons": "^5.7.0",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.0.7",
     "@types/node": "^22.13.4",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
-    "tailwindcss": "^4.0.7",
+    "free-tex-packer-core": "^0.3.9",
+    "sharp": "^0.35.3",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.23.12",
     "typescript": "^5.7.3",
     "vite": "^6.1.1"
   }
