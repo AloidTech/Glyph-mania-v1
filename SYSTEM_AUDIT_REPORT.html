@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Glyph Mania — System Audit & Architecture Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    @page {
+      size: A4;
+      margin: 18mm 16mm 18mm 16mm;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #1e293b;
+      background: #ffffff;
+      line-height: 1.55;
+      font-size: 9.5pt;
+      margin: 0;
+      padding: 0;
+    }
+
+    .cover {
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .badge-header {
+      display: inline-block;
+      background: #0f172a;
+      color: #f8fafc;
+      font-size: 7.5pt;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-size: 20pt;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0 0 0.35rem 0;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 11pt;
+      color: #475569;
+      margin: 0 0 1rem 0;
+      font-weight: 500;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      font-size: 8pt;
+    }
+
+    .meta-item strong {
+      display: block;
+      color: #64748b;
+      text-transform: uppercase;
+      font-size: 7pt;
+      letter-spacing: 0.04em;
+    }
+
+    h2 {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 1.75rem 0 0.65rem 0;
+      padding-bottom: 0.3rem;
+      border-bottom: 1.5px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    h3 {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 1.25rem 0 0.4rem 0;
+    }
+
+    p {
+      margin: 0 0 0.75rem 0;
+      color: #334155;
+    }
+
+    ul, ol {
+      margin: 0 0 0.85rem 0;
+      padding-left: 1.35rem;
+      color: #334155;
+    }
+
+    li {
+      margin-bottom: 0.35rem;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.5pt;
+      background: #f1f5f9;
+      padding: 1px 4px;
+      border-radius: 3px;
+      color: #0f172a;
+      border: 1px solid #e2e8f0;
+    }
+
+    pre {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 0.85rem 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 0.75rem 0;
+      line-height: 1.45;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.85rem 0 1.25rem 0;
+      font-size: 8.5pt;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+      text-align: left;
+      padding: 6px 10px;
+      border: 1px solid #cbd5e1;
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    td {
+      padding: 6px 10px;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 7pt;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .badge-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .badge-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+    .badge-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .badge-info { background: #e0f2fe; color: #075985; border: 1px solid #bae6fd; }
+
+    .callout {
+      border-left: 4px solid #0f172a;
+      background: #f8fafc;
+      padding: 0.75rem 1rem;
+      margin: 0.85rem 0;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .callout-success { border-left-color: #16a34a; background: #f0fdf4; }
+    .callout-danger { border-left-color: #dc2626; background: #fef2f2; }
+    .callout-warning { border-left-color: #d97706; background: #fffbeb; }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      color: #94a3b8;
+      font-size: 7.5pt;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cover Header -->
+  <div class="cover">
+    <span class="badge-header">DeepMind Advanced Agentic Systems Architecture</span>
+    <h1>GLYPH MANIA — SYSTEM AUDIT & ARCHITECTURAL REVIEW</h1>
+    <div class="subtitle">Comprehensive Diagnostic Sweep, Defect Triage, and Full-Stack Code Review</div>
+    <div class="meta-grid">
+      <div class="meta-item">
+        <strong>Document Version</strong>
+        1.0.0 (Release Audit)
+      </div>
+      <div class="meta-item">
+        <strong>Audit Timestamp</strong>
+        September 10, 2026
+      </div>
+      <div class="meta-item">
+        <strong>Target Workspace</strong>
+        <code>AloidTech/Glyph-mania-v1</code>
+      </div>
+      <div class="meta-item">
+        <strong>Auditor Sign-off</strong>
+        Antigravity Lead Architect
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 1 -->
+  <h2>1. Executive Summary & Health Scorecard</h2>
+  <p>
+    A full-system diagnostic inspection of the <strong>Glyph Mania</strong> codebase was conducted across the client application, machine learning inference pipeline, database schema, and server runtimes. 
+    The immediate operational blocker — <em>"Every sigil in the sigil detection system is showing unknown sigil"</em> — was traced to a mismatch between database UUIDs, semantic IDs, hardcoded fallback strings, and cold-start weights in the Zustand store. This issue has been definitively resolved.
+  </p>
+  <p>
+    Beyond this defect, the system audit revealed architectural redundancies, including a ghost Express backend, business logic duplication across three independent runtimes, and oversized monolithic UI components.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">System Subsystem</th>
+        <th style="width: 12%;">Health</th>
+        <th style="width: 15%;">Audit Status</th>
+        <th style="width: 48%;">Findings & Primary Diagnosis</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Sigil Detection & Recognition</strong></td>
+        <td><span class="badge badge-success">A (Restored)</span></td>
+        <td>Resolved</td>
+        <td>Universal canonical resolver deployed with multi-tiered fallback (neural network &rarr; k-NN &rarr; canonical defaults).</td>
+      </tr>
+      <tr>
+        <td><strong>Backend Infrastructure</strong></td>
+        <td><span class="badge badge-danger">C (Critical)</span></td>
+        <td>Action Required</td>
+        <td>Orphan Express.js server (port 5000) running with mock JSON files while frontend relies on Supabase.</td>
+      </tr>
+      <tr>
+        <td><strong>Solidity & Rules Engine</strong></td>
+        <td><span class="badge badge-danger">D (Critical)</span></td>
+        <td>Action Required</td>
+        <td>~600 lines of complex solidity logic triplicated across Browser (TS), Deno Edge Function, and Node server.</td>
+      </tr>
+      <tr>
+        <td><strong>Frontend Component Architecture</strong></td>
+        <td><span class="badge badge-warning">C+ (Warning)</span></td>
+        <td>Needs Refactor</td>
+        <td>Monolithic pages (<code>GlyphTestingPage.tsx</code> at 1,309 LOC, <code>SigilTrainingPage.tsx</code> at 881 LOC).</td>
+      </tr>
+      <tr>
+        <td><strong>Machine Learning Pipeline</strong></td>
+        <td><span class="badge badge-success">B+ (Good)</span></td>
+        <td>Operational</td>
+        <td>QuickDraw 512-dim CNN is clean with robust bounding box centering and tensor memory disposal.</td>
+      </tr>
+      <tr>
+        <td><strong>Database & Storage Layer</strong></td>
+        <td><span class="badge badge-success">B (Good)</span></td>
+        <td>Operational</td>
+        <td>Supabase schema is clean, but <code>saved_models</code> was persisting only to local IndexedDB.</td>
+      </tr>
+      <tr>
+        <td><strong>Dependency & Asset Hygiene</strong></td>
+        <td><span class="badge badge-warning">B- (Warning)</span></td>
+        <td>Cleanup Needed</td>
+        <td>Unused <code>react-icons</code> package in <code>package.json</code>; duplicate <code>src/public/</code> directory.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Section 2 -->
+  <h2>2. Root Cause Analysis: The "Unknown Sigil" Detection Bug</h2>
+  <div class="callout callout-danger">
+    <strong>Symptom:</strong> Every drawn symbol in the Atelier workshop and Glyph Testing studio reported <code>Unknown effector sigil</code>, <code>Unknown sigil for direction top: North Anchor</code>, or <code>Unknown sigil for form slot topLeft: Top-Left Augmentor</code>.
+  </div>
+
+  <h3>Root Cause Breakdown</h3>
+  <ol>
+    <li>
+      <strong>Database UUID vs. Semantic ID Mismatch:</strong>
+      Supabase migrated sigils with UUID primary keys (e.g., <code>b27411bd-2c07-42c4-bd7f-b8acdaf26cca</code> for Fire). However, existing glyph drafts, seeded presets, and ML predictions referenced semantic identifiers (<code>eff-fire</code>, <code>aug-position</code>) or labels (<code>Fire</code>). In <code>glyph_solidity.ts</code>, <code>getSigil(id)</code> strictly tested <code>s.id === id</code>. Consequently, lookups using semantic IDs or labels always returned <code>undefined</code>.
+    </li>
+    <li>
+      <strong>Cardinal Direction Anchor Fallback Defect:</strong>
+      In <code>glyph_semantic_engine.ts</code>, cardinal directional arrows were recognized and segmented into top, right, bottom, and left slots. When converting to compositions, fallback labels were hardcoded to <code>'North Anchor'</code>, <code>'East Anchor'</code>, <code>'South Anchor'</code>, <code>'West Anchor'</code>. Because the database sigil is named <code>'Position'</code>, lookup failed and generated <code>Unknown sigil: North Anchor</code>.
+    </li>
+    <li>
+      <strong>Uninitialized Machine Learning Weights:</strong>
+      <code>recognizeCropCanvas()</code> aborted with <code>available: false</code> when <code>savedWeights</code> in Zustand was empty. On clean startup, <code>savedWeights</code> is <code>null</code>, causing every slot to yield <code>null</code> labels, which immediately triggered solidity failure.
+    </li>
+    <li>
+      <strong>Empty Initial Store State:</strong>
+      When components mounted before the asynchronous Supabase query resolved, <code>useAdminSigilsStore.getState().sigils</code> was empty (<code>[]</code>), causing 100% of sigil lookups to fail.
+    </li>
+  </ol>
+
+  <h3>Remediation Deployed</h3>
+  <ul>
+    <li><strong>Universal Canonical Sigil Resolver (<code>sigils.ts</code>):</strong> Built <code>resolveCanonicalSigil()</code> that resolves UUIDs, semantic IDs (<code>eff-fire</code>), element names (<code>fire</code>), cardinal labels (<code>North Anchor</code>, <code>top</code> &rarr; Position Augmentor), and form types.</li>
+    <li><strong>Multi-Tiered Inference Pipeline (<code>glyph_semantic_engine.ts</code>):</strong> Cardinal directional slots now automatically resolve to the Position Augmentor. Effector and form slots fallback gracefully to exemplar k-NN or foundational presets when weights are not yet trained.</li>
+    <li><strong>Synchronized Backend Edge Logic (<code>glyph_logic.ts</code>):</strong> Upgraded edge function validation to support both UUIDs and semantic aliases.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <!-- Section 3 -->
+  <h2>3. Full Architectural Audit & Deep-Dive</h2>
+
+  <h3>3.1 Backend & Data Architecture</h3>
+  <div class="callout callout-warning">
+    <strong>Finding: The "Ghost" Express Backend Server</strong><br>
+    The project contains an active Express.js server (<code>backend/src/server.ts</code>) listening on port 5000 that reads and writes to local files (<code>backend/data/saves.json</code>, <code>backend/data/settings.json</code>).
+  </div>
+  <p>
+    <strong>Impact Analysis:</strong> The entire production frontend uses Supabase (<code>@supabase/supabase-js</code>) for Authentication, Database, Storage, and Edge Functions. The Express server is an abandoned legacy backend that creates port collisions, confuses deployment pipelines, and causes architectural drift.
+  </p>
+  <p>
+    <strong>Recommendation:</strong> Formally decommission <code>backend/src/server.ts</code>. Migrate settings persistence to a Supabase <code>user_settings</code> table.
+  </p>
+
+  <h3>3.2 Code Duplication Across 3 Environments</h3>
+  <p>
+    A critical architectural violation is the exact duplication of the ~600-line <code>isSolid()</code> and <code>analyzeSolidity()</code> rule set across three independent files:
+  </p>
+  <ul>
+    <li><code>frontend/src/lib/glyph_helpers/glyph_solidity.ts</code> (Vite / Browser React)</li>
+    <li><code>backend/supabase/functions/_shared/glyph_logic.ts</code> (Deno / Supabase Edge)</li>
+    <li><code>backend/src/lib/glyph_logic.ts</code> (Node.js / Express)</li>
+  </ul>
+  <p>
+    <strong>Risk:</strong> Any change to game balance, tolerance thresholds, or sigil requirements must be manually applied in 3 places. Any drift causes glyph saves to fail server-side validation.
+  </p>
+
+  <h3>3.3 Frontend Monolithic Components</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Component File</th>
+        <th>Lines of Code</th>
+        <th>File Size</th>
+        <th>Architectural Violation & Separation of Concerns</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>GlyphTestingPage.tsx</code></td>
+        <td>1,309 LOC</td>
+        <td>55.6 KB</td>
+        <td>Contains canvas rendering, radial compass SVG graphs, error popup overlays, save glyph modal, and model exploration.</td>
+      </tr>
+      <tr>
+        <td><code>SigilTrainingPage.tsx</code></td>
+        <td>881 LOC</td>
+        <td>41.2 KB</td>
+        <td>Bundles exemplar recording, Recharts telemetry charts, TensorFlow training loops, and test canvas recognition.</td>
+      </tr>
+      <tr>
+        <td><code>WorkshopSceneUi.tsx</code></td>
+        <td>729 LOC</td>
+        <td>26.5 KB</td>
+        <td>Mixes Atelier canvas, hotbar inventory, testing ground transitions, diagnostic popups, and speech bubble overlays.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>3.4 Dependency & File System Hygiene</h3>
+  <ul>
+    <li><strong>Dead Dependency:</strong> <code>react-icons</code> is declared in <code>frontend/package.json</code> but has <strong>0 imports</strong> across the codebase. The project correctly standardized on <code>@phosphor-icons/react</code>.</li>
+    <li><strong>Misplaced Folder:</strong> <code>frontend/src/public/</code> contains atlas textures. Vite serves assets strictly from <code>frontend/public/</code>; the folder in <code>src/</code> is dead weight.</li>
+  </ul>
+
+  <!-- Section 4 -->
+  <h2>4. Prioritized Architectural Roadmap</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Phase</th>
+        <th>Action Item</th>
+        <th>Priority</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Phase 1</strong></td>
+        <td>Resolve Sigil Detection & Solidity Breakdown (UUID & alias resolver)</td>
+        <td><span class="badge badge-danger">P0 - Critical</span></td>
+        <td><span class="badge badge-success">Completed</span></td>
+      </tr>
+      <tr>
+        <td><strong>Phase 1</strong></td>
+        <td>Multi-tiered inference fallback in <code>glyph_semantic_engine.ts</code></td>
+        <td><span class="badge badge-danger">P0 - Critical</span></td>
+        <td><span class="badge badge-success">Completed</span></td>
+      </tr>
+      <tr>
+        <td><strong>Phase 2</strong></td>
+        <td>Decommission Express server & mock JSON files</td>
+        <td><span class="badge badge-warning">P1 - High</span></td>
+        <td>Scheduled Next</td>
+      </tr>
+      <tr>
+        <td><strong>Phase 2</strong></td>
+        <td>Extract shared <code>glyph_logic</code> into isomorphic package</td>
+        <td><span class="badge badge-warning">P1 - High</span></td>
+        <td>Scheduled Next</td>
+      </tr>
+      <tr>
+        <td><strong>Phase 2</strong></td>
+        <td>Remove unused <code>react-icons</code> & delete <code>src/public/</code></td>
+        <td><span class="badge badge-info">P2 - Medium</span></td>
+        <td>Scheduled Next</td>
+      </tr>
+      <tr>
+        <td><strong>Phase 3</strong></td>
+        <td>Decompose <code>GlyphTestingPage.tsx</code> into atomic modular components</td>
+        <td><span class="badge badge-info">P2 - Medium</span></td>
+        <td>Scheduled Next</td>
+      </tr>
+      <tr>
+        <td><strong>Phase 3</strong></td>
+        <td>Sync <code>saved_models_store</code> directly with Supabase PostgreSQL</td>
+        <td><span class="badge badge-info">P2 - Medium</span></td>
+        <td>Scheduled Next</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>Glyph Mania Engineering Team &bull; Confidential</span>
+    <span>Generated by Antigravity Agentic Systems Architecture</span>
+    <span>Page 1 of 1</span>
+  </div>
+
+</body>
+</html>
