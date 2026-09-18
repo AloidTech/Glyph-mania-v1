@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Phaser + Three.js: Assets & Collisions</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #game-container {
+      position: relative;
+      width: 960px;
+      height: 540px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Universal pixel art scaling for ALL canvases */
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    #phaser-canvas {
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    #three-canvas {
+      z-index: 1;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.80.1/phaser.min.js"></script>
+</head>
+
+<body>
+
+  <div id="game-container">
+    <canvas id="three-canvas"></canvas>
+    <div id="phaser-canvas"></div>
+  </div>
+
+  <script>
+    const INTERNAL_WIDTH = 320;
+    const INTERNAL_HEIGHT = 180;
+
+    // ==========================================
+    // UTILITY: GENERATE "REAL" PIXEL TEXTURES
+    // (Replace these with TextureLoader in your real game)
+    // ==========================================
+    function createTexture(type) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 16; canvas.height = 16;
+      const ctx = canvas.getContext('2d');
+
+      if (type === 'floor') {
+        ctx.fillStyle = '#3a4466'; ctx.fillRect(0, 0, 16, 16);
+        ctx.fillStyle = '#262b44'; ctx.fillRect(0, 0, 8, 8); ctx.fillRect(8, 8, 8, 8);
+      } else if (type === 'wall') {
+        ctx.fillStyle = '#8b5444'; ctx.fillRect(0, 0, 16, 16);
+        ctx.fillStyle = '#6a3e31'; ctx.fillRect(0, 8, 16, 2); ctx.fillRect(8, 0, 2, 16);
+      } else if (type === 'player') {
+        ctx.fillStyle = '#00000000'; ctx.clearRect(0, 0, 16, 16); // Transparent bg
+        ctx.fillStyle = '#ff4157'; ctx.fillRect(4, 4, 8, 12);     // Body
+        ctx.fillStyle = '#ffcca5'; ctx.fillRect(5, 0, 6, 6);      // Head
+      }
+
+      const tex = new THREE.CanvasTexture(canvas);
+      // CRITICAL: Forces pixel-perfect scaling for retro assets
+      tex.magFilter = THREE.NearestFilter;
+      tex.minFilter = THREE.NearestFilter;
+      return tex;
+    }
+
+    // ==========================================
+    // 1. THREE.JS 3D WORLD SETUP
+    // ==========================================
+    const threeRenderer = new THREE.WebGLRenderer({
+      canvas: document.getElementById('three-canvas'),
+      antialias: false,
+      alpha: false
+    });
+    threeRenderer.setSize(INTERNAL_WIDTH, INTERNAL_HEIGHT, false);
+
+    const threeScene = new THREE.Scene();
+    threeScene.background = new THREE.Color(0x181425);
+
+    // Camera setup for exactly 16 pixels per tile unit to stop sub-pixel jitter
+    const aspect = INTERNAL_WIDTH / INTERNAL_HEIGHT;
+    const viewSize = 11.25;
+    const threeCamera = new THREE.OrthographicCamera(
+      -viewSize * aspect / 2, viewSize * aspect / 2,
+      viewSize / 2, -viewSize / 2, 0.1, 1000
+    );
+
+    // Steeper Dimraeth isometric angle
+    threeCamera.position.set(20, 20, 20);
+    threeCamera.lookAt(0, 0, 0);
+
+    // Lighting
+    threeScene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    const dirLight = new THREE.DirectionalLight(0xffeedd, 0.9);
+    dirLight.position.set(10, 20, 10);
+    threeScene.add(dirLight);
+
+    // Setup Textures
+    // TO USE REAL IMAGES, DO THIS INSTEAD: 
+    // const texLoader = new THREE.TextureLoader();
+    // const floorTex = texLoader.load('assets/floor.png'); floorTex.magFilter = THREE.NearestFilter;
+    const floorTex = createTexture('floor');
+    const wallTex = createTexture('wall');
+    const playerTex = createTexture('player');
+
+    // Build World & Collision Map
+    const collisionMap = new Set();
+    const floorMat = new THREE.MeshLambertMaterial({ map: floorTex });
+    const tileGeo = new THREE.BoxGeometry(1, 0.1, 1);
+
+    for (let x = -5; x < 5; x++) {
+      for (let z = -5; z < 5; z++) {
+        const tile = new THREE.Mesh(tileGeo, floorMat);
+        tile.position.set(x, 0, z);
+        threeScene.add(tile);
+      }
+    }
+
+    // Add Walls & Register Collisions
+    const wallGeo = new THREE.BoxGeometry(1, 1.8, 1);
+    const wallMat = new THREE.MeshLambertMaterial({ map: wallTex });
+
+    function addWall(x, z) {
+      const wall = new THREE.Mesh(wallGeo, wallMat);
+      wall.position.set(x, 0.9, z);
+      threeScene.add(wall);
+      collisionMap.add(`${x},${z}`); // Store coordinate string
+    }
+
+    addWall(-2, -2);
+    addWall(1, -3);
+    addWall(1, -2); // Creating a little corner to test sliding
+
+    // Player Sprite (2D Billboard)
+    const spriteMat = new THREE.SpriteMaterial({ map: playerTex, transparent: true });
+    const player = new THREE.Sprite(spriteMat);
+    // Scale slightly up and lift so feet touch the ground
+    player.scale.set(1, 1.2, 1);
+    player.position.set(0, 0.6, 0);
+    threeScene.add(player);
+
+    // ==========================================
+    // 2. PHASER 3 CONTROLLER & UI SCENE
+    // ==========================================
+    class MainScene extends Phaser.Scene {
+      constructor() { super('MainScene'); }
+
+      create() {
+        this.cursors = this.input.keyboard.createCursorKeys();
+        this.add.text(4, 4, 'Assets & Collisions Active', {
+          fontFamily: 'monospace', fontSize: '8px', color: '#fff',
+          backgroundColor: '#0008', padding: { x: 4, y: 2 }
+        });
+      }
+
+      update(time, delta) {
+        const speed = 0.005 * delta;
+        let dx = 0; let dz = 0;
+
+        if (this.cursors.left.isDown) { dx -= 1; dz += 1; }
+        if (this.cursors.right.isDown) { dx += 1; dz -= 1; }
+        if (this.cursors.up.isDown) { dx -= 1; dz -= 1; }
+        if (this.cursors.down.isDown) { dx += 1; dz += 1; }
+
+        if (dx !== 0 || dz !== 0) {
+          const length = Math.hypot(dx, dz);
+          dx = (dx / length) * speed;
+          dz = (dz / length) * speed;
+
+          // --- COLLISION CHECKING ---
+          // We check X and Z movement separately. This allows the player to "slide" 
+          // along a wall if they press diagonally into it.
+
+          const nextX = player.position.x + dx;
+          const nextZ = player.position.z + dz;
+
+          // Check if the X movement hits a block
+          if (!collisionMap.has(`${Math.round(nextX)},${Math.round(player.position.z)}`)) {
+            player.position.x = nextX;
+          }
+
+          // Check if the Z movement hits a block
+          if (!collisionMap.has(`${Math.round(player.position.x)},${Math.round(nextZ)}`)) {
+            player.position.z = nextZ;
+          }
+        }
+
+        // Camera tracking
+        threeCamera.position.x = player.position.x + 20;
+        threeCamera.position.z = player.position.z + 20;
+
+        threeRenderer.render(threeScene, threeCamera);
+      }
+    }
+
+    new Phaser.Game({
+      type: Phaser.AUTO,
+      width: INTERNAL_WIDTH, height: INTERNAL_HEIGHT,
+      parent: 'phaser-canvas', transparent: true,
+      pixelArt: true,
+      scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
+      scene: MainScene
+    });
+  </script>
+</body>
+
+</html>

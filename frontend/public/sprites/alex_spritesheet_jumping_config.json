@@ -1,0 +1,199 @@
+{
+  "texture": "spritesheet",
+  "frameWidth": 256,
+  "frameHeight": 256,
+  "totalFrames": 8,
+  "phaserLoadCode": "this.load.spritesheet('player_idle', 'path/to/spritesheet.png', { frameWidth: 256, frameHeight: 256, margin: 0, spacing: 0 });",
+  "padding": {
+    "unit": "game pixels",
+    "frameSize": 256,
+    "targetCharacterHeight": 200,
+    "bottomGroundMargin": 26,
+    "jumpHeadroom": 31,
+    "groundBaselineY": 231,
+    "horizontalCenterPercent": 51,
+    "topPadding": 31,
+    "bottomPadding": 26,
+    "leftPadding": 90,
+    "rightPadding": 82,
+    "masterCanvas1024Measurements": {
+      "canvasSize": 1024,
+      "characterHeightPx": 799,
+      "bottomGroundMarginPx": 102,
+      "jumpHeadroomPx": 123,
+      "groundBaselineYPx": 922
+    },
+    "hitboxRecommendation": {
+      "note": "Apply these hitbox sizes & offsets in Phaser so character feet sit flush on the ground without hovering:",
+      "hitboxWidth": 80,
+      "hitboxHeight": 200,
+      "offsetX": 88,
+      "offsetY": 30,
+      "offsetXFormula": "(frameWidth - hitboxWidth) / 2",
+      "offsetYFormula": "frameHeight - hitboxHeight - bottomGroundMargin",
+      "phaserSnippet": "this.player.body.setSize(80, 200); this.player.body.setOffset(88, 30);"
+    }
+  },
+  "frames": [
+    {
+      "index": 0,
+      "name": "Gemini_Generated_Image_pltvvwpltvvwpltv_frame_01",
+      "x": 0,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 90,
+        "y": 19,
+        "width": 84,
+        "height": 208
+      },
+      "padding": {
+        "top": 19,
+        "bottom": 29,
+        "left": 90,
+        "right": 82
+      }
+    },
+    {
+      "index": 1,
+      "name": "Gemini_Generated_Image_pltvvwpltvvwpltv_frame_02",
+      "x": 256,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 78,
+        "y": 62,
+        "width": 108,
+        "height": 166
+      },
+      "padding": {
+        "top": 62,
+        "bottom": 28,
+        "left": 78,
+        "right": 70
+      }
+    },
+    {
+      "index": 2,
+      "name": "Gemini_Generated_Image_pltvvwpltvvwpltv_frame_03",
+      "x": 512,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 70,
+        "y": 31,
+        "width": 130,
+        "height": 197
+      },
+      "padding": {
+        "top": 31,
+        "bottom": 28,
+        "left": 70,
+        "right": 56
+      }
+    },
+    {
+      "index": 3,
+      "name": "Gemini_Generated_Image_pltvvwpltvvwpltv_frame_04",
+      "x": 768,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 68,
+        "y": 0,
+        "width": 128,
+        "height": 200
+      },
+      "padding": {
+        "top": 0,
+        "bottom": 56,
+        "left": 68,
+        "right": 60
+      }
+    },
+    {
+      "index": 4,
+      "name": "Gemini_Generated_Image_pltvvwpltvvwpltv_frame_05",
+      "x": 1024,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 69,
+        "y": 18,
+        "width": 120,
+        "height": 184
+      },
+      "padding": {
+        "top": 18,
+        "bottom": 54,
+        "left": 69,
+        "right": 67
+      }
+    },
+    {
+      "index": 5,
+      "name": "Gemini_Generated_Image_pltvvwpltvvwpltv_frame_07",
+      "x": 1280,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 77,
+        "y": 40,
+        "width": 99,
+        "height": 188
+      },
+      "padding": {
+        "top": 40,
+        "bottom": 28,
+        "left": 77,
+        "right": 80
+      }
+    },
+    {
+      "index": 6,
+      "name": "Gemini_Generated_Image_pltvvwpltvvwpltv_frame_08",
+      "x": 1536,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 63,
+        "y": 77,
+        "width": 116,
+        "height": 151
+      },
+      "padding": {
+        "top": 77,
+        "bottom": 28,
+        "left": 63,
+        "right": 77
+      }
+    },
+    {
+      "index": 7,
+      "name": "Gemini_Generated_Image_pltvvwpltvvwpltv_frame_09",
+      "x": 1792,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 77,
+        "y": 39,
+        "width": 101,
+        "height": 189
+      },
+      "padding": {
+        "top": 39,
+        "bottom": 28,
+        "left": 77,
+        "right": 78
+      }
+    }
+  ]
+}

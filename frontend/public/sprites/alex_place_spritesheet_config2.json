@@ -1,0 +1,219 @@
+{
+  "texture": "spritesheet",
+  "frameWidth": 256,
+  "frameHeight": 256,
+  "totalFrames": 9,
+  "phaserLoadCode": "this.load.spritesheet('player_idle', 'path/to/spritesheet.png', { frameWidth: 256, frameHeight: 256, margin: 0, spacing: 0 });",
+  "padding": {
+    "unit": "game pixels",
+    "frameSize": 256,
+    "targetCharacterHeight": 195,
+    "bottomGroundMargin": 28,
+    "jumpHeadroom": 33,
+    "groundBaselineY": 228,
+    "horizontalCenterPercent": 51,
+    "topPadding": 33,
+    "bottomPadding": 28,
+    "leftPadding": 92,
+    "rightPadding": 82,
+    "masterCanvas1024Measurements": {
+      "canvasSize": 1024,
+      "characterHeightPx": 778,
+      "bottomGroundMarginPx": 113,
+      "jumpHeadroomPx": 133,
+      "groundBaselineYPx": 911
+    },
+    "hitboxRecommendation": {
+      "note": "Apply these hitbox sizes & offsets in Phaser so character feet sit flush on the ground without hovering:",
+      "hitboxWidth": 80,
+      "hitboxHeight": 195,
+      "offsetX": 88,
+      "offsetY": 33,
+      "offsetXFormula": "(frameWidth - hitboxWidth) / 2",
+      "offsetYFormula": "frameHeight - hitboxHeight - bottomGroundMargin",
+      "phaserSnippet": "this.player.body.setSize(80, 195); this.player.body.setOffset(88, 33);"
+    }
+  },
+  "frames": [
+    {
+      "index": 0,
+      "name": "alex_directional_spritesheet (3)_frame_01",
+      "x": 0,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 92,
+        "y": 31,
+        "width": 82,
+        "height": 197
+      },
+      "padding": {
+        "top": 31,
+        "bottom": 28,
+        "left": 92,
+        "right": 82
+      }
+    },
+    {
+      "index": 1,
+      "name": "alex_directional_spritesheet (3)_frame_02",
+      "x": 256,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 92,
+        "y": 31,
+        "width": 82,
+        "height": 197
+      },
+      "padding": {
+        "top": 31,
+        "bottom": 28,
+        "left": 92,
+        "right": 82
+      }
+    },
+    {
+      "index": 2,
+      "name": "alex_directional_spritesheet (3)_frame_03",
+      "x": 512,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 91,
+        "y": 31,
+        "width": 84,
+        "height": 197
+      },
+      "padding": {
+        "top": 31,
+        "bottom": 28,
+        "left": 91,
+        "right": 81
+      }
+    },
+    {
+      "index": 3,
+      "name": "alex_directional_spritesheet (3)_frame_04",
+      "x": 768,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 95,
+        "y": 42,
+        "width": 95,
+        "height": 186
+      },
+      "padding": {
+        "top": 42,
+        "bottom": 28,
+        "left": 95,
+        "right": 66
+      }
+    },
+    {
+      "index": 4,
+      "name": "alex_directional_spritesheet (3)_frame_05",
+      "x": 1024,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 89,
+        "y": 63,
+        "width": 102,
+        "height": 165
+      },
+      "padding": {
+        "top": 63,
+        "bottom": 28,
+        "left": 89,
+        "right": 65
+      }
+    },
+    {
+      "index": 5,
+      "name": "alex_directional_spritesheet (3)_frame_06",
+      "x": 1280,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 73,
+        "y": 75,
+        "width": 129,
+        "height": 153
+      },
+      "padding": {
+        "top": 75,
+        "bottom": 28,
+        "left": 73,
+        "right": 54
+      }
+    },
+    {
+      "index": 6,
+      "name": "alex_directional_spritesheet (3)_frame_07",
+      "x": 1536,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 72,
+        "y": 79,
+        "width": 161,
+        "height": 149
+      },
+      "padding": {
+        "top": 79,
+        "bottom": 28,
+        "left": 72,
+        "right": 23
+      }
+    },
+    {
+      "index": 7,
+      "name": "alex_f08_sprite_256-1.png",
+      "x": 1792,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 74,
+        "y": 75,
+        "width": 121,
+        "height": 153
+      },
+      "padding": {
+        "top": 75,
+        "bottom": 28,
+        "left": 74,
+        "right": 61
+      }
+    },
+    {
+      "index": 8,
+      "name": "alex_f01_sprite_256",
+      "x": 2048,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 92,
+        "y": 31,
+        "width": 82,
+        "height": 197
+      },
+      "padding": {
+        "top": 31,
+        "bottom": 28,
+        "left": 92,
+        "right": 82
+      }
+    }
+  ]
+}

@@ -1,0 +1,239 @@
+{
+  "texture": "spritesheet",
+  "frameWidth": 256,
+  "frameHeight": 256,
+  "totalFrames": 10,
+  "phaserLoadCode": "this.load.spritesheet('player_idle', 'path/to/spritesheet.png', { frameWidth: 256, frameHeight: 256, margin: 0, spacing: 0 });",
+  "padding": {
+    "unit": "game pixels",
+    "frameSize": 256,
+    "targetCharacterHeight": 179,
+    "bottomGroundMargin": 39,
+    "jumpHeadroom": 38,
+    "groundBaselineY": 218,
+    "horizontalCenterPercent": 51,
+    "topPadding": 38,
+    "bottomPadding": 39,
+    "leftPadding": 93,
+    "rightPadding": 83,
+    "masterCanvas1024Measurements": {
+      "canvasSize": 1024,
+      "characterHeightPx": 717,
+      "bottomGroundMarginPx": 154,
+      "jumpHeadroomPx": 153,
+      "groundBaselineYPx": 870
+    },
+    "hitboxRecommendation": {
+      "note": "Apply these hitbox sizes & offsets in Phaser so character feet sit flush on the ground without hovering:",
+      "hitboxWidth": 80,
+      "hitboxHeight": 179,
+      "offsetX": 88,
+      "offsetY": 38,
+      "offsetXFormula": "(frameWidth - hitboxWidth) / 2",
+      "offsetYFormula": "frameHeight - hitboxHeight - bottomGroundMargin",
+      "phaserSnippet": "this.player.body.setSize(80, 179); this.player.body.setOffset(88, 38);"
+    }
+  },
+  "frames": [
+    {
+      "index": 0,
+      "name": "Gemini_Generated_Image_xf1hmpxf1hmpxf1h_frame_01",
+      "x": 0,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 93,
+        "y": 33,
+        "width": 80,
+        "height": 190
+      },
+      "padding": {
+        "top": 33,
+        "bottom": 33,
+        "left": 93,
+        "right": 83
+      }
+    },
+    {
+      "index": 1,
+      "name": "Gemini_Generated_Image_xf1hmpxf1hmpxf1h_frame_02",
+      "x": 256,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 95,
+        "y": 38,
+        "width": 75,
+        "height": 179
+      },
+      "padding": {
+        "top": 38,
+        "bottom": 39,
+        "left": 95,
+        "right": 86
+      }
+    },
+    {
+      "index": 2,
+      "name": "Gemini_Generated_Image_xf1hmpxf1hmpxf1h_frame_03",
+      "x": 512,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 92,
+        "y": 33,
+        "width": 81,
+        "height": 190
+      },
+      "padding": {
+        "top": 33,
+        "bottom": 33,
+        "left": 92,
+        "right": 83
+      }
+    },
+    {
+      "index": 3,
+      "name": "Gemini_Generated_Image_xf1hmpxf1hmpxf1h_frame_04",
+      "x": 768,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 91,
+        "y": 44,
+        "width": 92,
+        "height": 179
+      },
+      "padding": {
+        "top": 44,
+        "bottom": 33,
+        "left": 91,
+        "right": 73
+      }
+    },
+    {
+      "index": 4,
+      "name": "Gemini_Generated_Image_xf1hmpxf1hmpxf1h_frame_05",
+      "x": 1024,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 85,
+        "y": 64,
+        "width": 99,
+        "height": 159
+      },
+      "padding": {
+        "top": 64,
+        "bottom": 33,
+        "left": 85,
+        "right": 72
+      }
+    },
+    {
+      "index": 5,
+      "name": "Gemini_Generated_Image_xf1hmpxf1hmpxf1h_frame_06",
+      "x": 1280,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 67,
+        "y": 76,
+        "width": 125,
+        "height": 147
+      },
+      "padding": {
+        "top": 76,
+        "bottom": 33,
+        "left": 67,
+        "right": 64
+      }
+    },
+    {
+      "index": 6,
+      "name": "Gemini_Generated_Image_xf1hmpxf1hmpxf1h_frame_07",
+      "x": 1536,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 67,
+        "y": 79,
+        "width": 155,
+        "height": 144
+      },
+      "padding": {
+        "top": 79,
+        "bottom": 33,
+        "left": 67,
+        "right": 34
+      }
+    },
+    {
+      "index": 7,
+      "name": "Gemini_Generated_Image_xf1hmpxf1hmpxf1h_frame_08",
+      "x": 1792,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 69,
+        "y": 74,
+        "width": 162,
+        "height": 149
+      },
+      "padding": {
+        "top": 74,
+        "bottom": 33,
+        "left": 69,
+        "right": 25
+      }
+    },
+    {
+      "index": 8,
+      "name": "Gemini_Generated_Image_xf1hmpxf1hmpxf1h_frame_09",
+      "x": 2048,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 93,
+        "y": 34,
+        "width": 140,
+        "height": 189
+      },
+      "padding": {
+        "top": 34,
+        "bottom": 33,
+        "left": 93,
+        "right": 23
+      }
+    },
+    {
+      "index": 9,
+      "name": "Gemini_Generated_Image_xf1hmpxf1hmpxf1h_frame_10",
+      "x": 2304,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 93,
+        "y": 33,
+        "width": 141,
+        "height": 190
+      },
+      "padding": {
+        "top": 33,
+        "bottom": 33,
+        "left": 93,
+        "right": 22
+      }
+    }
+  ]
+}
