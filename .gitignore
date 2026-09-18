@@ -3,6 +3,15 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Compiled build output
+frontend/dist/
+backend/dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
 # User-specific files
 *.rsuser
 *.suo
