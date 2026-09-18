@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import savesRouter from './routes/saves.js';
 import settingsRouter from './routes/settings.js';
-import leaderboardRouter from './routes/leaderboard.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,7 +23,6 @@ app.get('/api/health', (_req, res) => {
 // API Routes
 app.use('/api/saves', savesRouter);
 app.use('/api/settings', settingsRouter);
-app.use('/api/leaderboard', leaderboardRouter);
 
 // Start Server
 app.listen(PORT, () => {

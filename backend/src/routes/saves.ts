@@ -1,18 +1,19 @@
 import { Router, Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
+import { SaveSlot } from '../types/index.js';
 
 const router = Router();
 const dataDir = path.resolve(process.cwd(), 'data');
 const savesFilePath = path.join(dataDir, 'saves.json');
 
 // Helper to ensure data folder and JSON file exist
-function getSavesData() {
+function getSavesData(): SaveSlot[] {
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
   }
   if (!fs.existsSync(savesFilePath)) {
-    const initial = [
+    const initial: SaveSlot[] = [
       {
         id: 'save-1',
         slotName: 'Vault of Antiquity',
@@ -39,13 +40,13 @@ function getSavesData() {
   }
   try {
     const content = fs.readFileSync(savesFilePath, 'utf-8');
-    return JSON.parse(content);
+    return JSON.parse(content) as SaveSlot[];
   } catch {
     return [];
   }
 }
 
-function writeSavesData(saves: any[]) {
+function writeSavesData(saves: SaveSlot[]) {
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
   }
@@ -60,14 +61,14 @@ router.get('/', (_req: Request, res: Response) => {
 
 // POST /api/saves - Save a new slot or update existing slot
 router.post('/', (req: Request, res: Response) => {
-  const saveSlot = req.body;
+  const saveSlot: Partial<SaveSlot> & { slotName: string } = req.body;
   if (!saveSlot || !saveSlot.slotName) {
     res.status(400).json({ success: false, error: 'Invalid save slot payload' });
     return;
   }
 
   const saves = getSavesData();
-  const index = saves.findIndex((s: any) => s.id === saveSlot.id);
+  const index = saves.findIndex((s) => s.id === saveSlot.id);
 
   if (index >= 0) {
     saves[index] = { ...saves[index], ...saveSlot };
@@ -93,7 +94,7 @@ router.post('/', (req: Request, res: Response) => {
 router.delete('/:id', (req: Request, res: Response) => {
   const { id } = req.params;
   let saves = getSavesData();
-  saves = saves.filter((s: any) => s.id !== id);
+  saves = saves.filter((s) => s.id !== id);
   writeSavesData(saves);
   res.json({ success: true, saves });
 });

@@ -1,12 +1,13 @@
 import { Router, Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
+import { Settings } from '../types/index.js';
 
 const router = Router();
 const dataDir = path.resolve(process.cwd(), 'data');
 const settingsFilePath = path.join(dataDir, 'settings.json');
 
-const DEFAULT_SETTINGS = {
+const DEFAULT_SETTINGS: Settings = {
   masterVolume: 80,
   bgmVolume: 70,
   sfxVolume: 85,
@@ -16,7 +17,7 @@ const DEFAULT_SETTINGS = {
   difficulty: 'Normal'
 };
 
-function getSettingsData() {
+function getSettingsData(): Settings {
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
   }
@@ -26,13 +27,13 @@ function getSettingsData() {
   }
   try {
     const content = fs.readFileSync(settingsFilePath, 'utf-8');
-    return { ...DEFAULT_SETTINGS, ...JSON.parse(content) };
+    return { ...DEFAULT_SETTINGS, ...JSON.parse(content) } as Settings;
   } catch {
     return DEFAULT_SETTINGS;
   }
 }
 
-function writeSettingsData(settings: any) {
+function writeSettingsData(settings: Settings) {
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
   }
