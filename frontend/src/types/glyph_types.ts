@@ -44,7 +44,7 @@ export interface FormAugmentorSigil extends SigilAssetRefs {
     label: string;
     type: 'augmentor';
     augmentorType: 'form';
-    formType: FormType;
+    formType?: FormType;
     tier: number;
     description: string;
 }
@@ -62,13 +62,39 @@ export interface Tier {
 
 // ===== Glyph =====
 
+export interface GlyphComposition {
+    effector?: {
+        sigilId?: string;
+        label?: string;
+        element?: Element;
+        customCrop?: string; // Data URL or asset path
+        confidence?: number;
+    };
+    directions: {
+        top?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number };
+        right?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number };
+        bottom?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number };
+        left?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number };
+    };
+    formAugmentors: {
+        topLeft?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number };
+        topRight?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number };
+        bottomLeft?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number };
+        bottomRight?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number };
+    };
+    strokes?: StrokePoint[] | any[];
+}
+
 export interface GlyphBase {
     id: string;
-    tierId: string;
+    userId?: string;
+    name?: string;
+    description?: string;
+    element?: Element;
+    tier: number;
+    isPublic?: boolean;
     schemaId?: string;
-    positionSlots: (string | null)[];  // length 4, Sigil ids (augmentor/position)
-    formSlots: (string | null)[];       // length 4, Sigil ids (augmentor/form)
-    centerSlot: string | null;           // Sigil id (effector)
+    composition: GlyphComposition;
 }
 
 export interface WorkshopGlyph extends GlyphBase {

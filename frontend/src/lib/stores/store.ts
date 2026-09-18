@@ -1,8 +1,36 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { Stroke } from './types/glyph_types';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { Stroke } from '../../types/glyph_types';
 
-export type ScreenState = 'MAIN_MENU' | 'SETTINGS' | 'IN_GAME' | 'PAUSED';
+const safeLocalStorage = {
+  getItem: (name: string): string | null => {
+    try {
+      return typeof window !== 'undefined' ? window.localStorage.getItem(name) : null;
+    } catch {
+      return null;
+    }
+  },
+  setItem: (name: string, value: string): void => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(name, value);
+      }
+    } catch (err) {
+      console.warn(`[store] Quota exceeded or error saving "${name}" to localStorage:`, err);
+    }
+  },
+  removeItem: (name: string): void => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem(name);
+      }
+    } catch {
+      // ignore
+    }
+  },
+};
+
+export type ScreenState = 'MAIN_MENU' | 'SETTINGS' | 'IN_GAME' | 'PAUSED' | 'TESTING_GROUND';
 
 export interface SettingsState {
   masterVolume: number;
@@ -13,19 +41,24 @@ export interface SettingsState {
 export interface GameState {
   activeScreen: ScreenState;
   settings: SettingsState;
+  selectedTestingGlyphs: any[];
+  testingGroundMode: 'ISOMETRIC' | 'OBLIQUE' | 'SIDE_VIEW';
 
   // Navigation & Actions
   setScreen: (screen: ScreenState) => void;
   startNewGame: () => void;
   resetGameSession: () => void;
   updateSettings: (partial: Partial<SettingsState>) => void;
+  setSelectedTestingGlyphs: (glyphs: any[]) => void;
+  startTestingGround: (glyphs: any[]) => void;
+  setTestingGroundMode: (mode: 'ISOMETRIC' | 'OBLIQUE' | 'SIDE_VIEW') => void;
 }
 
 export interface WorkShopState {
   selectedTool: string;
   strokes: Stroke[];
   redoStack: Stroke[];
-  
+
   setSelectedTool: (tool: string) => void;
   addStroke: (stroke: Stroke) => void;
   undo: () => void;
@@ -83,6 +116,8 @@ export const useGameStore = create<GameState>()(
   persist(
     (set) => ({
       activeScreen: 'MAIN_MENU',
+      selectedTestingGlyphs: [],
+      testingGroundMode: 'SIDE_VIEW',
 
       settings: {
         masterVolume: 80,
@@ -101,11 +136,22 @@ export const useGameStore = create<GameState>()(
           settings: { ...state.settings, ...partial },
         }));
       },
+
+      setSelectedTestingGlyphs: (glyphs) => set({ selectedTestingGlyphs: glyphs }),
+
+      startTestingGround: (glyphs) => set({
+        selectedTestingGlyphs: glyphs,
+        activeScreen: 'TESTING_GROUND',
+      }),
+
+      setTestingGroundMode: (mode) => set({ testingGroundMode: mode }),
     }),
     {
       name: 'game-store-storage',
+      storage: createJSONStorage(() => safeLocalStorage),
       partialize: (state) => ({
         settings: state.settings,
+        selectedTestingGlyphs: state.selectedTestingGlyphs,
       }),
     }
   )

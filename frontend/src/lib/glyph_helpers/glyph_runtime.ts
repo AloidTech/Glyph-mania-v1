@@ -1,46 +1,16 @@
+/**
+ * @file glyph_runtime.ts
+ * @description In-Game Glyph Runtime & Scene Inventory Execution.
+ * Manages active placed/activated glyph instances during gameplay preview, replay,
+ * and execution modes in Phaser scenes.
+ */
+
 import type {
-  GlyphBase,
-  Sigil,
-  FormAugmentorSigil,
   ActiveGlyphInstance,
   SceneGlyphInventory,
   Transform,
   Direction,
-  FormType,
-} from './types/glyph_types';
-
-// ===== Pure Business Logic =====
-
-/**
- * A glyph is "solid" when:
- *  1. All 4 cardinal position slots are filled.
- *  2. All 4 diagonal form slots are filled with one uniform FormType.
- */
-export function isSolid(
-  glyph: GlyphBase,
-  sigilLookup: Record<string, Sigil>
-): boolean {
-  // Check all position slots filled
-  const positionsFilled = glyph.positionSlots.every((id) => id !== null);
-  if (!positionsFilled) return false;
-
-  // Check all form slots filled
-  const formIds = glyph.formSlots;
-  if (!formIds.every((id) => id !== null)) return false;
-
-  // Check uniform form type
-  const formTypes = formIds.map((id) => {
-    const sigil = sigilLookup[id!];
-    if (!sigil || sigil.type !== 'augmentor') return null;
-    if (sigil.augmentorType !== 'form') return null;
-    return (sigil as FormAugmentorSigil).formType;
-  });
-
-  const firstForm = formTypes[0];
-  if (firstForm === null) return false;
-
-  return formTypes.every((ft): ft is FormType => ft === firstForm);
-}
+} from '../../types/glyph_types';
 
 /**
  * Returns the cast direction for an active glyph instance.
@@ -89,9 +59,7 @@ export function replay(inventory: SceneGlyphInventory): SceneGlyphInventory {
 /**
  * Exit preview scene — transition back to 'edit' mode and clear active instances.
  */
-export function exitPreviewScene(
-  inventory: SceneGlyphInventory
-): SceneGlyphInventory {
+export function exitPreviewScene(inventory: SceneGlyphInventory): SceneGlyphInventory {
   return {
     mode: 'edit',
     instances: [],
