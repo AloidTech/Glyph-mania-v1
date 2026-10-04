@@ -6,10 +6,12 @@ import { CornerSigil } from '../BackgroundElements/CornerSigil';
 import { RuneDivider } from '../BackgroundElements/RuneDivider';
 import { HeaderOrnament } from '../BackgroundElements/HeaderOrnament';
 import { ProfileDropdown } from '../Dropdowns/ProfileDropdown';
+import { useAuth } from '../../lib/supabase/auth/useAuth';
 
 export const MainMenuUi: React.FC = () => {
   const setScreen = useGameStore((state) => state.setScreen);
   const startNewGame = useGameStore((state) => state.startNewGame);
+  const { isAdmin } = useAuth();
 
   return (
     <div className="main-menu-container interactive-ui">
@@ -53,9 +55,11 @@ export const MainMenuUi: React.FC = () => {
             Enter Testing Ground
           </button>
 
-          <Link to="/admin_dashboard/sigils" className="btn-arcane-secondary" style={{ textDecoration: 'none', display: 'inline-flex', justifyContent: 'center', alignItems: 'center' }}>
-            Admin Studio
-          </Link>
+          {isAdmin && (
+            <Link to="/admin_dashboard/sigils" className="btn-arcane-secondary" style={{ textDecoration: 'none', display: 'inline-flex', justifyContent: 'center', alignItems: 'center' }}>
+              Admin Studio
+            </Link>
+          )}
 
           <button onClick={() => setScreen('SETTINGS')} className="btn-arcane-secondary">
             Settings

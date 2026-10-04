@@ -45,9 +45,20 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: corsHeaders });
     }
 
-    // Optional: Validate if the user is an Admin
-    // const { data: profile } = await supabaseClient.from('profiles').select('role').eq('id', user.id).single();
-    // if (profile?.role !== 'admin') throw new Error("Only admins can create sigils.");
+    // 1.1 Validate if the user has an Admin role
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    const isAdmin = profile?.role === 'admin' || user.app_metadata?.role === 'admin' || user.user_metadata?.role === 'admin';
+    if (!isAdmin) {
+      return new Response(JSON.stringify({ error: "Only admins can create or modify sigils." }), {
+        status: 403,
+        headers: corsHeaders,
+      });
+    }
 
     // 2. Parse Request
     const payload = await req.json() as CreateSigilRequest;
