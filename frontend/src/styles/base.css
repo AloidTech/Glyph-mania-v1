@@ -10,6 +10,7 @@
   box-sizing: border-box;
 }
 
+html,
 body {
   font-family: var(--font-body);
   font-size: var(--text-base);
@@ -18,11 +19,13 @@ body {
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  width: 100svw;
+  height: 100svh;
 }
 
 #root {
-  width: 100vw;
-  height: 100vh;
+  width: 100svw;
+  height: 100svh;
   overflow: hidden;
 }
 
@@ -71,6 +74,7 @@ p {
     opacity: 0;
     transform: translateY(6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -81,21 +85,100 @@ p {
   animation: fadeIn 0.25s var(--transition-smooth);
 }
 
-/* Custom Scrollbar */
+/* ============================================
+   CUSTOM SCROLLBARS
+   ============================================ */
+
+/* Global Default Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(18, 16, 26, 0.6);
+  background: transparent;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(201, 162, 39, 0.3);
-  border-radius: var(--radius-sm);
+  background: rgba(44, 40, 38, 0.18);
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+
+/* Firefox standard scrollbar support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(44, 40, 38, 0.2) transparent;
+}
+
+/* Variant 1: Outer Container Scrollbar (5px, refined parchment style) */
+.scroll-outer {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(44, 40, 38, 0.22) transparent;
+}
+
+.scroll-outer::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.scroll-outer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-outer::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.scroll-outer::-webkit-scrollbar-thumb {
+  background: rgba(44, 40, 38, 0.2);
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 0.2s ease;
+}
+
+.scroll-outer::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+
+/* Variant 2: Inner Dropdown / Sub-list Scrollbar (3px ultra-slim style) */
+.scroll-inner {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(44, 40, 38, 0.16) transparent;
+}
+
+.scroll-inner::-webkit-scrollbar {
+  width: 2.5px;
+  height: 3.5px;
+}
+
+.scroll-inner::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-inner::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.scroll-inner::-webkit-scrollbar-thumb {
+  background: rgba(44, 40, 38, 0.16);
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 0.2s ease;
+}
+
+.scroll-inner::-webkit-scrollbar-thumb:hover {
   background: var(--color-accent);
 }

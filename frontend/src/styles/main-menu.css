@@ -1,25 +1,186 @@
 /* ============================================
    GLYPH MANIA - MAIN MENU & SETTINGS STYLES
+   Atelier Theme (Parchment & Ink)
    ============================================ */
 
+/* ---------- Main Menu Outer Container ---------- */
+.main-menu-container,
 .main-menu-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
+  width: 100svw;
+  height: 100svh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: var(--space-xl) var(--space-2xl);
-  pointer-events: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--color-bg);
   z-index: 10;
 }
 
-.main-menu-overlay > * {
+.main-menu-overlay>* {
   pointer-events: auto;
 }
 
+/* Background Atmosphere Overlays */
+.menu-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 55% 65% at 50% 50%, transparent 40%, rgba(44, 40, 38, 0.05) 100%);
+  z-index: 1;
+}
+
+.menu-purple-bloom {
+  display: none;
+  /* Removed for Atelier theme */
+}
+
+/* Centered Content Stack */
+.main-menu-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  max-width: 360px;
+  width: 100%;
+  padding: 0 var(--space-lg);
+  animation: fadeIn 0.6s var(--transition-smooth);
+}
+
+.main-menu-hero,
+.menu-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.main-menu-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  margin-right: -0.28em;
+  /* Trims trailing letter-spacing gap */
+  color: var(--color-primary);
+  text-shadow: none;
+  line-height: 1;
+  text-align: center;
+}
+
+.main-menu-subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(0.88rem, 2.2vw, 1.05rem);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.07em;
+  margin-top: var(--space-md);
+  text-align: center;
+}
+
+.main-menu-divider {
+  width: 100%;
+  margin-top: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  opacity: 0.4;
+}
+
+.main-menu-actions,
+.menu-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+}
+
+.main-menu-version {
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  color: var(--color-text-muted);
+  margin-top: var(--space-xl);
+  text-align: center;
+}
+
+/* ---------- Button Base System ---------- */
+.btn-arcane-primary,
+.btn-arcane-secondary,
+.btn-arcane-ghost {
+  font-family: var(--font-display);
+  letter-spacing: 0.15em;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  user-select: none;
+  display: block;
+  width: 100%;
+  text-align: center;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+/* ---------- Primary Button (Ink on Parchment) ---------- */
+.btn-arcane-primary {
+  padding: 0.95rem 2rem;
+  background: var(--color-primary);
+  color: var(--color-bg);
+  border: 1px solid var(--color-primary);
+  box-shadow: none;
+  transition: background 0.18s ease, transform 0.12s ease;
+}
+
+.btn-arcane-primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.btn-arcane-primary:active {
+  transform: scale(0.98);
+}
+
+/* ---------- Secondary Button (Bordered Ink) ---------- */
+/* ---------- Secondary Button (Bordered Ink) ---------- */
+.btn-arcane-secondary {
+  padding: 0.95rem 2rem;
+  background: var(--color-glass);
+  color: var(--color-primary);
+  border: 1px solid var(--color-glass-border-strong);
+  box-shadow: var(--shadow-sm);
+  transition: background 0.18s ease, transform 0.12s ease;
+}
+
+.btn-arcane-secondary:hover {
+  background: var(--color-glass-raised);
+}
+
+.btn-arcane-secondary:active {
+  transform: scale(0.98);
+}
+
+/* ---------- Ghost Button (Transparent, Fade In) ---------- */
+.btn-arcane-ghost {
+  padding: 0.6rem 2rem;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: none;
+  transition: opacity 0.18s ease, transform 0.12s ease;
+}
+
+.btn-arcane-ghost:hover {
+  color: var(--color-text-primary);
+}
+
+.btn-arcane-ghost:active {
+  transform: scale(0.98);
+}
+
+/* ---------- Header Brand Component ---------- */
 .menu-header {
   display: flex;
   justify-content: space-between;
@@ -32,29 +193,13 @@
   gap: var(--space-sm);
 }
 
-.menu-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  margin-top: -3rem;
-}
-
-.menu-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-md);
-  margin-bottom: var(--space-lg);
-}
-
-/* Modal Overlay & Settings */
+/* ---------- Modal Overlay & Settings ---------- */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(10, 8, 16, 0.82);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(232, 228, 219, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 100;
   display: flex;
   align-items: center;
@@ -65,22 +210,23 @@
 .settings-modal,
 .pause-modal {
   width: 100%;
-  max-width: 480px;
+  max-width: 430px;
   background: var(--color-surface);
   border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-md);
   padding: var(--space-xl);
-  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  box-shadow: var(--shadow-panel);
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+  color: var(--color-text-primary);
 }
 
 .settings-modal h3,
 .pause-modal h3 {
   font-family: var(--font-heading);
   font-size: var(--text-2xl);
-  color: var(--color-text-accent);
+  color: var(--color-text-base);
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.08em;

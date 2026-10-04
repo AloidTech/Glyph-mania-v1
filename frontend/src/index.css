@@ -9,4 +9,6 @@
 @import './styles/tooltips.css';
 @import './styles/workshop.css';
 @import './styles/main-menu.css';
+@import './styles/admin.css';
+@import './styles/admin-select.css';
 @import './styles/responsive.css';

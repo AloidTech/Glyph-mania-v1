@@ -17,8 +17,8 @@
   }
 }
 
-/* ---------- Mobile & Portrait Tablets (<= 768px) ---------- */
-@media (max-width: 768px) {
+/* ---------- Mobile Portrait (<= 768px in portrait) ---------- */
+@media (max-width: 768px) and (orientation: portrait) {
   .game-scene-overlay {
     padding: var(--space-sm);
   }
@@ -29,13 +29,13 @@
     gap: var(--space-sm);
   }
 
-  /* Catalog Area stacks neatly at bottom on mobile */
+  /* Catalog Area stacks neatly at bottom on mobile portrait */
   .catelog-area {
     width: 100%;
     height: 180px;
     margin-right: 0;
     margin-top: var(--space-sm);
-    padding: var(--space-sm);
+    padding: var(--space-xs);
     border-radius: var(--radius-lg);
   }
 
@@ -49,12 +49,12 @@
     gap: var(--space-xs);
   }
 
-  /* Drawing Area takes primary focus on mobile */
+  /* Drawing Area takes primary focus on mobile portrait */
   .drawing-area {
     margin-left: 0;
     width: 100%;
-    height: calc(100vh - 270px);
-    min-height: 320px;
+    height: calc(100svh - 270px);
+    min-height: 300px;
     border-radius: var(--radius-lg);
   }
 
@@ -62,11 +62,12 @@
     width: min(300px, 85%);
   }
 
-  /* Tool-box switches to horizontal top-left layout on mobile */
+  /* Tool-box orientation stays vertical (downward) on mobile */
   .tool-box {
     top: 10px;
     left: 10px;
-    flex-direction: row;
+    bottom: auto;
+    flex-direction: column;
     padding: 6px;
     gap: 6px;
     border-radius: var(--radius-md);
@@ -77,36 +78,56 @@
     height: 32px;
   }
 
+  /* Tooltip bubbles pop to the right of the vertical toolbar without top clipping */
+  .tool-box .tooltip-bubble,
+  .tool-box .tooltip-menu-bubble {
+    left: calc(100% + 10px);
+    top: 0;
+    bottom: auto;
+    transform: scale(0.95);
+    transform-origin: top left;
+  }
+
+  .tool-box .tooltip-bubble::before {
+    top: 12px;
+    bottom: auto;
+    right: 100%;
+    left: auto;
+    transform: none;
+    border-color: transparent var(--color-glass-border-strong) transparent transparent;
+  }
+
+  .tool-box .tooltip-menu-wrapper.tooltip-menu-open > .tooltip-menu-bubble {
+    transform: scale(1);
+  }
+
+  /* Test glyph button mobile portrait */
+  .test-glyph-btn {
+    padding: 0.4rem 0.85rem;
+    font-size: 0.74rem;
+    gap: 0.35rem;
+  }
+
   /* Header adjustments for mobile */
   .game-header {
-    padding: 0 var(--space-xs);
+    padding: 0;
+    border: none;
+    box-shadow: none;
   }
 
-  .game-header-info h4 {
-    font-size: var(--text-sm);
+  .game-header-status-pill {
+    display: none;
   }
 
-  /* Tooltip adjustment on touch devices */
-  .tooltip-bubble {
-    left: 50%;
-    top: calc(100% + 8px);
-    transform: translateX(-50%) scale(0.92);
+  .game-header-subtitle {
+    display: none;
   }
 
-  .tooltip-bubble::before {
-    right: auto;
-    left: 50%;
-    bottom: 100%;
-    top: auto;
-    transform: translateX(-50%);
-    border-color: transparent transparent var(--color-glass-border-strong) transparent;
+  .header-btn-label {
+    display: none;
   }
 
-  .tooltip-wrapper:hover .tooltip-bubble {
-    transform: translateX(-50%) scale(1);
-  }
-
-  /* Main Menu mobile scaling */
+  /* Main Menu mobile portrait scaling */
   .main-menu-overlay {
     padding: var(--space-md);
   }
@@ -121,13 +142,385 @@
 
   .settings-modal,
   .pause-modal {
-    max-width: 90vw;
+    max-width: 90svw;
     padding: var(--space-md);
   }
 }
 
-/* ---------- Small Mobile Phones (<= 480px) ---------- */
-@media (max-width: 480px) {
+/* ==============================================================================
+   MOBILE LANDSCAPE (Screens with limited vertical height <= 540px in landscape)
+   ============================================================================== */
+@media (orientation: landscape) and (max-height: 540px) {
+  /* ---------- 1. Main Menu Scaling in Mobile Landscape ---------- */
+  .main-menu-container,
+  .main-menu-overlay {
+    padding: 4px 12px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .main-menu-content {
+    max-width: 420px;
+    height: 100%;
+    max-height: 100%;
+    padding: 0 10px;
+    justify-content: center;
+    margin: auto;
+  }
+
+  .main-menu-hero,
+  .menu-hero {
+    margin: 0;
+  }
+
+  /* Hide ornamental header on short landscape to prioritize title */
+  .main-menu-hero svg,
+  .menu-hero svg,
+  .header-ornament {
+    display: none !important;
+  }
+
+  .main-menu-title {
+    font-size: clamp(1.4rem, 5vh, 1.95rem);
+    letter-spacing: 0.18em;
+    margin-right: -0.18em;
+    line-height: 1.05;
+    margin-bottom: 2px;
+  }
+
+  .main-menu-subtitle {
+    font-size: 0.72rem;
+    margin-top: 1px;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+  }
+
+  .main-menu-divider {
+    margin-top: 3px;
+    margin-bottom: 6px;
+    max-width: 200px;
+  }
+
+  .main-menu-actions,
+  .menu-actions {
+    gap: 5px;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .btn-arcane-primary {
+    padding: 0.36rem 0.9rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    min-height: 32px;
+  }
+
+  .btn-arcane-secondary {
+    padding: 0.3rem 0.85rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    min-height: 30px;
+  }
+
+  .btn-arcane-ghost {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.68rem;
+  }
+
+  .main-menu-version {
+    display: none !important;
+  }
+
+  .corner-sigil {
+    width: 44px;
+    height: 44px;
+    opacity: 0.25;
+  }
+
+  .profile-trigger-fab {
+    bottom: 6px;
+    left: 6px;
+    width: 32px;
+    height: 32px;
+  }
+
+  /* ---------- 2. Workshop Scene & Header in Mobile Landscape ---------- */
+  .game-scene-overlay {
+    padding: 4px 8px;
+  }
+
+  .game-header {
+    padding: 0;
+    gap: 6px;
+  }
+
+  .game-header-title {
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+  }
+
+  .game-header-subtitle {
+    display: none;
+  }
+
+  .game-header-status-pill {
+    display: none;
+  }
+
+  .header-btn-label {
+    display: none;
+  }
+
+  .header-action-btn {
+    width: 28px;
+    height: 28px;
+    padding: 4px;
+  }
+
+  .game-scene-content {
+    display: flex;
+    flex-direction: row;
+    margin-top: 4px;
+    gap: 6px;
+    height: calc(100svh - 38px);
+    min-height: 0;
+    flex: 1;
+  }
+
+  /* ---------- 3. Catalog Area in Mobile Landscape ---------- */
+  .catelog-area {
+    width: 34%;
+    min-width: 200px;
+    max-width: 280px;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 6px 8px;
+    border-radius: var(--radius-md);
+  }
+
+  .catelog-header {
+    margin-bottom: 4px;
+  }
+
+  .catelog-tab {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.68rem;
+  }
+
+  .catelog-subtitle {
+    display: none;
+  }
+
+  .catelog-entry-title {
+    font-size: 0.68rem;
+    margin: 4px 0 2px;
+  }
+
+  .sigil-tier-group h4 {
+    font-size: 0.62rem;
+    margin-bottom: 2px;
+  }
+
+  .sigil-catelog {
+    gap: 4px;
+    flex-wrap: wrap;
+    flex-direction: row;
+  }
+
+  .sigil-items {
+    width: 30px;
+    height: 30px;
+    padding: 3px;
+  }
+
+  .glyph-search-input {
+    padding: 0.32rem 2rem 0.32rem 1.8rem;
+    font-size: 0.72rem;
+  }
+
+  .glyph-accordion-header {
+    padding: 4px 6px;
+    font-size: 0.72rem;
+  }
+
+  .glyph-card-compact {
+    padding: 4px 6px;
+    gap: 6px;
+  }
+
+  .glyph-card-compact .status-icon-badge {
+    bottom: 6px;
+    right: 6px;
+    width: 15px;
+    height: 15px;
+  }
+
+  .glyph-card-preview {
+    width: 28px;
+    height: 28px;
+    padding: 2px;
+  }
+
+  .glyph-card-name {
+    font-size: 0.74rem;
+  }
+
+  .glyph-card-desc {
+    font-size: 0.65rem;
+    max-height: 2.3em;
+    padding-right: 14px;
+  }
+
+  /* ---------- 4. Drawing Area & Action Buttons in Mobile Landscape ---------- */
+  .drawing-area {
+    flex: 1;
+    width: auto;
+    height: 100%;
+    max-height: 100%;
+    min-height: 0;
+    margin: 0;
+    border-radius: var(--radius-md);
+  }
+
+  .drawing-area-guide {
+    width: min(220px, 80%);
+    height: min(220px, 80%);
+  }
+
+  /* Tool-box orientation stays vertical (downward) on mobile landscape */
+  .tool-box {
+    top: 6px;
+    left: 6px;
+    bottom: auto;
+    padding: 3px;
+    gap: 3px;
+    border-radius: 6px;
+    flex-direction: column;
+  }
+
+  .tool-bar-item {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* Tooltip bubbles pop to the right of vertical toolbar in landscape without clipping */
+  .tool-box .tooltip-bubble,
+  .tool-box .tooltip-menu-bubble {
+    left: calc(100% + 8px);
+    top: 0;
+    bottom: auto;
+    transform: scale(0.92);
+    transform-origin: top left;
+    min-width: 155px;
+    padding: 8px 12px;
+  }
+
+  .tool-box .tooltip-bubble::before {
+    top: 8px;
+    bottom: auto;
+    right: 100%;
+    left: auto;
+    transform: none;
+    border-color: transparent var(--color-glass-border-strong) transparent transparent;
+  }
+
+  .tool-box .tooltip-menu-wrapper.tooltip-menu-open > .tooltip-menu-bubble {
+    transform: scale(1);
+  }
+
+  .drawing-actions-cluster {
+    top: 6px;
+    right: 6px;
+    gap: 4px;
+  }
+
+  .test-glyph-btn {
+    padding: 0.28rem 0.65rem;
+    font-size: 0.68rem;
+    border-radius: 999px;
+    gap: 0.3rem;
+  }
+
+  .test-glyph-btn .test-glyph-icon {
+    width: 13px;
+    height: 13px;
+  }
+
+  .test-glyph-ready-beacon {
+    width: 5px;
+    height: 5px;
+  }
+
+  .save-glyph-floating-btn {
+    width: 1.85rem;
+    height: 1.85rem;
+  }
+
+  .save-glyph-floating-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* ---------- Glyph Details Modal in Mobile Landscape ---------- */
+  .glyph-details-modal {
+    max-height: 94vh !important;
+    max-width: 520px !important;
+    border-radius: 12px !important;
+  }
+
+  .glyph-details-header {
+    padding: 0.4rem 0.8rem !important;
+  }
+
+  .glyph-details-content {
+    padding: 0.5rem 0.8rem !important;
+    gap: 0.55rem !important;
+  }
+
+  .glyph-details-top-grid {
+    grid-template-columns: 80px 1fr !important;
+    gap: 0.65rem !important;
+  }
+
+  .glyph-details-preview-box {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  .glyph-details-footer {
+    padding: 0.4rem 0.8rem !important;
+  }
+
+  .glyph-details-footer .btn {
+    padding: 0.35rem 0.75rem !important;
+    font-size: 0.72rem !important;
+  }
+
+  /* ---------- Safety Confirmation Modal in Mobile Landscape ---------- */
+  .confirmation-modal-dialog {
+    max-height: 92vh !important;
+    max-width: 380px !important;
+    padding: 0.75rem 1rem !important;
+    gap: 0.6rem !important;
+    border-radius: 12px !important;
+  }
+}
+
+/* ---------- Touch Device Hover Cleanup ---------- */
+@media (hover: none) {
+  /* Prevent standard static tooltips from sticking open indefinitely after touch */
+  .tooltip-wrapper:not(.tooltip-menu-wrapper):hover > .tooltip-bubble,
+  .tooltip-children:hover + .tooltip-bubble {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+/* ---------- Small Mobile Phones (<= 480px in portrait) ---------- */
+@media (max-width: 480px) and (orientation: portrait) {
   .catelog-area {
     height: 140px;
   }

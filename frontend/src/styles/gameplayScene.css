@@ -1,0 +1,545 @@
+/* ==========================================================================
+   MAGE UI STYLES: HOTBAR SELECTOR & MINI PARCHMENT SCROLL DRAWING PAD
+   Theme: Arcane Grimoire & Antique Parchment Scroll
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   BOTTOM GLYPH HOTBAR SELECTOR
+   -------------------------------------------------------------------------- */
+.gameplay-hotbar-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: auto;
+  user-select: none;
+}
+
+/* Floating Item Name Label above hotbar */
+.gameplay-hotbar-label-banner {
+  margin-bottom: 8px;
+  padding: 4px 14px;
+  background: rgba(31, 41, 55, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(156, 163, 175, 0.3);
+  border-radius: 9999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: hotbarFadeIn 0.2s ease-out;
+  pointer-events: none;
+}
+
+.gameplay-hotbar-label-text {
+  font-family: 'Cinzel', 'Trajan Pro', serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #f8fafc;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+.gameplay-hotbar-label-element {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Main Hotbar Strip: GREY METALLIC STONE CASING (NOT BLUE) */
+.gameplay-hotbar-strip {
+  display: flex;
+  align-items: center;
+  background: #707070;
+  border: 3px solid #474f5c;
+  border-top-color: #7b8594;
+  border-left-color: #6c7685;
+  border-bottom-color: #3b4350;
+  border-right-color: #3b4350;
+  border-radius: 6px;
+  padding: 3px;
+  gap: 3px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+/* Individual Hotbar Slot */
+.gameplay-hotbar-slot {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.12s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+/* UNOCCUPIED SLOTS: Transparent with Grey Filter */
+.gameplay-hotbar-slot.is-empty {
+  background: transparent;
+  backdrop-filter: blur(4px) grayscale(100%);
+  -webkit-backdrop-filter: blur(4px) grayscale(100%);
+  border: 2px solid rgba(100, 116, 139, 0.35);
+  border-top-color: rgba(30, 36, 46, 0.6);
+  border-left-color: rgba(30, 36, 46, 0.6);
+  border-bottom-color: rgba(148, 163, 184, 0.4);
+  border-right-color: rgba(148, 163, 184, 0.4);
+  box-shadow: inset 1px 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.gameplay-hotbar-slot.is-empty:hover {
+  background: rgba(45, 52, 65, 0.45) !important;
+  border-color: rgba(156, 163, 175, 0.6);
+}
+
+/* OCCUPIED SLOTS: Whitish Cream Background */
+.gameplay-hotbar-slot.has-item {
+  background: #fbf7ee !important;
+  border: 2px solid #8e9cae;
+  border-top-color: #64748b;
+  border-left-color: #64748b;
+  border-bottom-color: #cbd5e1;
+  border-right-color: #cbd5e1;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.gameplay-hotbar-slot.has-item:hover {
+  background: #ffffff !important;
+}
+
+/* ACTIVE SELECTED SLOT: Grey box outline, slightly less scaled up (1.03) */
+.gameplay-hotbar-slot.is-active {
+  z-index: 5;
+  transform: translateY(-2px) scale(1.2);
+  padding: 15px;
+  border: 3.5px solid var(--color-glyph-hotbar) !important;
+  box-shadow:
+    0 0 10px rgba(148, 163, 184, 0.45),
+    inset 0 0 4px rgba(148, 163, 184, 0.2),
+    0 3px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* AIMING / PLACING / ACTIVE CASTING STATE: Grey outline turns light red/orange */
+.gameplay-hotbar-slot.is-active.is-held,
+.gameplay-hotbar-slot.is-active.is-aiming,
+.gameplay-hotbar-slot.is-active.is-placing {
+  border: 2.5px solid #ff7733 !important;
+  box-shadow:
+    0 0 14px rgba(255, 119, 51, 0.7),
+    inset 0 0 4px rgba(255, 119, 51, 0.3),
+    0 3px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Glyph Icon Preview inside Slot: Increased Crop / Zoomed In */
+.gameplay-hotbar-glyph-icon {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  transform: scale(1.1);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+}
+
+/* Add Button Slot (+) taking back to Workshop */
+.gameplay-hotbar-add-slot {
+  position: relative;
+  width: 54px;
+  height: 54px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(30, 36, 46, 0.7) 100%);
+  border: 2px dashed rgba(245, 158, 11, 0.5);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fbbf24;
+  transition: all 0.2s ease;
+  margin-left: 2px;
+}
+
+.gameplay-hotbar-add-slot:hover {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(45, 52, 65, 0.9) 100%);
+  border-color: #fde047;
+  color: #fde047;
+  transform: translateY(-2px);
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   MINI DRAWING PAD: PARCHMENT SCROLL WITH WORKSHOP HORIZONTAL TOOLBAR
+   -------------------------------------------------------------------------- */
+.mini-scrollpad-container {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: var(--scroll-h, 450px);
+  z-index: 90;
+  pointer-events: auto;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.mini-scrollpad-container.is-closed {
+  pointer-events: none;
+}
+
+/* Horizontal Workshop Toolbar on Top */
+.gameplay-inventory-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  background: rgba(30, 36, 46, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Individual Toolbar Item copied directly from Workshop */
+.gameplay-scroll-tool-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.gameplay-scroll-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #f8fafc;
+  transform: translateY(-1px);
+}
+
+.gameplay-scroll-tool-btn:active {
+  transform: scale(0.94);
+}
+
+/* Active / Selected tool */
+.gameplay-scroll-tool-btn.selected {
+  background: #a07c34;
+  color: #ffffff;
+  border-color: #ffd700;
+  box-shadow: 0 2px 8px rgba(160, 124, 52, 0.45);
+  transform: scale(1.05);
+}
+
+/* Close / Collapse Button in Toolbar (Grey Floating Style) */
+.gameplay-scroll-tool-btn.btn-toggle-scroll {
+  background: #374151;
+  color: #e5e7eb;
+  border: 1px solid #6b7280;
+}
+
+.gameplay-scroll-tool-btn.btn-toggle-scroll:hover {
+  background: #4b5563;
+  color: #ffffff;
+}
+
+/* Embedded Workshop Toolbar inside Parchment Body */
+.gameplay-scroll-parchment-body .tool-box {
+  top: 8px;
+  gap: 6px;
+  padding: 5px 19px;
+  background: rgba(30, 36, 46, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  z-index: 25;
+}
+
+.gameplay-scroll-parchment-body .tool-bar-item {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+}
+
+.gameplay-scroll-parchment-body .tool-bar-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.gameplay-scroll-parchment-body .tool-bar-item.selected {
+  background: #a07c34;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(160, 124, 52, 0.4);
+}
+
+.gameplay-scroll-parchment-body .tool-bar-item.btn-toggle-scroll {
+  background: #374151;
+  color: #e5e7eb;
+  border: 1px solid #6b7280;
+}
+
+.gameplay-scroll-parchment-body .tool-bar-item.btn-toggle-scroll:hover {
+  background: #4b5563;
+  color: #ffffff;
+}
+
+/* Parchment Scroll Frame: Made Substantially Bigger */
+.gameplay-scroll-frame {
+  position: relative;
+  width: var(--scroll-w, 420px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  filter: drop-shadow(0 14px 32px rgba(0, 0, 0, 0.65));
+  transform: translateX(0);
+  opacity: 1;
+  transition:
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.25s ease;
+}
+
+/* Wooden Scroll Dowel Top Roller */
+.gameplay-scroll-roller-top {
+  width: calc(var(--scroll-w, 420px) + 24px);
+  height: 18px;
+  background: linear-gradient(180deg, #6c4228 0%, #4a2c18 45%, #2a160b 100%);
+  border: 1px solid #7c4d30;
+  border-radius: 8px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  position: relative;
+  z-index: 3;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Wooden Scroll Dowel Bottom Roller */
+.gameplay-scroll-roller-bottom {
+  width: calc(var(--scroll-w, 420px) + 24px);
+  height: 18px;
+  background: linear-gradient(180deg, #6c4228 0%, #4a2c18 45%, #2a160b 100%);
+  border: 1px solid #7c4d30;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  position: relative;
+  z-index: 3;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Brass Endcaps for Rollers */
+.gameplay-scroll-roller-top::before,
+.gameplay-scroll-roller-top::after,
+.gameplay-scroll-roller-bottom::before,
+.gameplay-scroll-roller-bottom::after {
+  content: '';
+  position: absolute;
+  top: -1px;
+  width: 14px;
+  height: 18px;
+  background: linear-gradient(180deg, #d4af37 0%, #aa8528 50%, #6d5214 100%);
+  border: 1px solid #ffd700;
+  border-radius: 3px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.gameplay-scroll-roller-top::before,
+.gameplay-scroll-roller-bottom::before {
+  left: 3px;
+}
+
+.gameplay-scroll-roller-top::after,
+.gameplay-scroll-roller-bottom::after {
+  right: 3px;
+}
+
+/* Parchment Body Canvas Area: Bigger 420px x 400px */
+.gameplay-scroll-parchment-body {
+  position: relative;
+  width: var(--scroll-w, 420px);
+  height: var(--scroll-h, 450px);
+  max-height: var(--scroll-h, 450px);
+  background-color: #f4eee1;
+  background-image: url('/assets/parchment.png');
+  background-size: cover;
+  background-position: center;
+  border-left: 2px solid rgba(139, 94, 59, 0.45);
+  border-right: 2px solid rgba(139, 94, 59, 0.45);
+  box-shadow: inset 0 10px 14px rgba(0, 0, 0, 0.2), inset 0 -10px 14px rgba(0, 0, 0, 0.2);
+  cursor: crosshair;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition:
+    max-height 0.26s cubic-bezier(0.25, 1, 0.5, 1),
+    opacity 0.2s ease;
+}
+
+/* Canvas Element */
+.gameplay-scroll-canvas {
+  width: 300px;
+  height: 280px;
+  display: block;
+}
+
+/* Arcane Center Guide (matching the main workshop atelier guide) */
+.gameplay-scroll-guide {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border: 1px dashed rgba(120, 80, 45, 0.28);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.gameplay-scroll-diamond-guide {
+  position: absolute;
+  width: 128px;
+  height: 128px;
+  border: 1px dashed rgba(120, 80, 45, 0.22);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+/* Crosshair Compass Ticks */
+.gameplay-scroll-crosshair {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at center, rgba(120, 80, 45, 0.08) 0%, transparent 65%),
+    linear-gradient(to right, transparent calc(50% - 1px), rgba(120, 80, 45, 0.15) calc(50% - 1px), rgba(120, 80, 45, 0.15) calc(50% + 1px), transparent calc(50% + 1px)),
+    linear-gradient(to bottom, transparent calc(50% - 1px), rgba(120, 80, 45, 0.15) calc(50% - 1px), rgba(120, 80, 45, 0.15) calc(50% + 1px), transparent calc(50% + 1px));
+}
+
+/* --------------------------------------------------------------------------
+   CLOSED SCROLL STATE: Closes UPWARDS and slides into the side!
+   -------------------------------------------------------------------------- */
+.gameplay-scroll-frame.is-closed {
+  transform: translateX(calc(100% + 50px));
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.18s,
+    opacity 0.22s ease 0.22s;
+}
+
+.gameplay-scroll-frame.is-closed .gameplay-scroll-parchment-body {
+  max-height: 0px !important;
+  height: 0px !important;
+  opacity: 0;
+  pointer-events: none;
+  border: none;
+  overflow: hidden !important;
+}
+
+.gameplay-scroll-frame.is-closed .gameplay-scroll-roller-top {
+  transform: none;
+}
+
+.gameplay-scroll-frame.is-closed .gameplay-scroll-roller-bottom {
+  transform: none;
+}
+
+/* Open Icon Button on Side: Only element shown when scroll is rolled up & slid away */
+.gameplay-scroll-open-icon-btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) scale(0.6);
+  z-index: 95;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #3d2212 0%, #22140a 60%, #150b05 100%);
+  border: 2px solid #d4af37;
+  color: #ffd700;
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.7),
+    0 0 12px rgba(212, 175, 55, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.25s ease,
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.gameplay-scroll-open-icon-btn.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(-50%) scale(1);
+  transition-delay: 0.25s;
+}
+
+.gameplay-scroll-open-icon-btn:hover {
+  transform: translateY(-50%) scale(1.12);
+  border-color: #ffe57f;
+  color: #ffffff;
+  background: linear-gradient(145deg, #4d2b17 0%, #2d1a0d 60%, #1c0e07 100%);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.8),
+    0 0 20px rgba(255, 215, 0, 0.65),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+.gameplay-scroll-open-icon-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* Animations */
+@keyframes hotbarFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Viewport Scaling for Mini Drawing Pad */
+@media (max-height: 780px) {
+  .mini-scrollpad-container {
+    --scroll-w: 380px !important;
+    --scroll-h: 340px !important;
+  }
+}
+
+@media (max-height: 640px) {
+  .mini-scrollpad-container {
+    --scroll-w: 320px !important;
+    --scroll-h: 280px !important;
+    right: 12px;
+  }
+}

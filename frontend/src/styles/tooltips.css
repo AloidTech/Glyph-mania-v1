@@ -1,5 +1,6 @@
 /* ============================================
    GLYPH MANIA - TOOLTIP STYLES (ENHANCED)
+   Atelier Theme (Parchment & Ink)
    ============================================ */
 
 .tooltip-wrapper {
@@ -11,24 +12,26 @@
 
 .tooltip-bubble {
   position: absolute;
-  left: calc(100% + 14px);
+  left: calc(100% + 16px);
   top: 50%;
   transform: translateY(-50%) scale(0.92);
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 7px 14px;
-  background: rgba(22, 18, 30, 0.96);
+  background: var(--color-glass-raised);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1.5px solid var(--color-glass-border-strong);
-  border-radius: var(--radius-md);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.65), 0 0 15px rgba(201, 162, 39, 0.15);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 6px rgba(44, 40, 38, 0.08);
   white-space: nowrap;
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 200;
+  color: var(--color-text-primary);
 }
 
 .tooltip-bubble::before {
@@ -42,8 +45,10 @@
   border-color: transparent var(--color-glass-border-strong) transparent transparent;
 }
 
-.tooltip-wrapper:hover .tooltip-bubble {
+.tooltip-children:hover+.tooltip-bubble {
   opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
   transform: translateY(-50%) scale(1);
 }
 
@@ -59,10 +64,270 @@
   font-family: var(--font-heading);
   font-size: var(--text-sm);
   font-weight: 700;
-  color: var(--color-accent);
+  color: var(--color-text-base);
   text-transform: lowercase;
-  background: rgba(201, 162, 39, 0.15);
+  background: var(--color-accent-muted);
   padding: 2px 6px;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(201, 162, 39, 0.3);
+  border: 1px solid var(--color-glass-border);
+}
+
+/* ============================================
+   TOOLTIP MENU (INTERACTIVE POPUP WITH SLIDER)
+   ============================================ */
+
+.tooltip-menu-bubble {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  min-width: 170px;
+}
+
+/* TooltipMenu does NOT use CSS hover — React controls .tooltip-menu-open */
+.tooltip-menu-wrapper:hover>.tooltip-bubble {
+  /* Override: prevent the generic tooltip hover rule from interfering */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-50%) scale(0.92);
+}
+
+/* When React adds .tooltip-menu-open, show the bubble */
+.tooltip-menu-wrapper.tooltip-menu-open>.tooltip-menu-bubble {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(-50%) scale(1);
+}
+
+/* Invisible bridge — only active when menu is open */
+.tooltip-menu-wrapper::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: -10px;
+  width: 20px;
+  height: calc(100% + 20px);
+  z-index: 199;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.tooltip-menu-wrapper.tooltip-menu-open::after {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.tooltip-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.tooltip-menu-slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.tooltip-slider-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.tooltip-slider-value {
+  font-family: var(--font-heading);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-text-base);
+  background: var(--color-accent-muted);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-glass-border);
+}
+
+/* Custom styled range slider */
+.tooltip-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(44, 40, 38, 0.15);
+  outline: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.tooltip-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.tooltip-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: var(--color-primary-hover);
+}
+
+.tooltip-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  border: none;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+
+/* ============================================
+   SIGIL PREVIEW TOOLTIP
+   ============================================ */
+
+.sigil-tooltip-bubble {
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  width: 210px;
+  min-width: 210px;
+  max-width: 210px;
+  box-sizing: border-box;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(44, 40, 38, 0.08), 0 1px 3px rgba(44, 40, 38, 0.04);
+}
+
+.sigil-tooltip-preview {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(44, 40, 38, 0.05);
+  border: 1px solid rgba(44, 40, 38, 0.1);
+  border-radius: var(--radius-md);
+  padding: 8px;
+}
+
+.sigil-tooltip-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.sigil-tooltip-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.tooltip-description {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  white-space: normal;
+  text-align: center;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* ============================================
+   SIGIL PORTAL TOOLTIP (ESCAPE OVERFLOW CLIPPING)
+   ============================================ */
+
+.sigil-tooltip-portal {
+  animation: sigilTooltipPopIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  box-shadow: 0 2px 8px rgba(44, 40, 38, 0.08), 0 1px 3px rgba(44, 40, 38, 0.04);
+}
+
+@keyframes sigilTooltipPopIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.93);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+/* ============================================
+   STATUS ICON BADGES (DRAFT & UNSAVED)
+   ============================================ */
+
+.status-icon-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  cursor: help;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+}
+
+.status-icon-badge:hover {
+  transform: scale(1.18);
+}
+
+.status-icon-badge.clickable {
+  cursor: pointer;
+}
+
+.status-icon-badge.clickable:hover {
+  transform: scale(1.25);
+  box-shadow: 0 0 8px rgba(197, 48, 48, 0.45);
+}
+
+.status-icon-badge.clickable:active {
+  transform: scale(0.92);
+}
+
+/* Status Badges: Consistently styled with design system variables */
+.status-icon-badge.draft,
+.status-icon-badge.unsaved {
+  background: var(--admin-danger-paper, #fff5f5);
+  color: var(--color-destructive, #8a3028);
+  border: 1.5px solid var(--admin-danger-border, #feb2b2);
+  box-shadow: var(--shadow-sm);
+}
+
+.status-icon-badge.draft:hover,
+.status-icon-badge.unsaved:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Positioning on compact glyph cards: bottom-right corner to separate cleanly from top-right element icon */
+.glyph-card-compact .status-icon-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  top: auto;
+  left: auto;
+  width: 17px;
+  height: 17px;
+  z-index: 5;
 }

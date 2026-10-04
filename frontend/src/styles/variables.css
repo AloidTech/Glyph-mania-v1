@@ -5,61 +5,64 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap');
 
 :root {
-  /* Core Arcane Palette */
-  --color-bg: #12101a;
-  --color-surface: #1c1828;
-  --color-surface-raised: #211a30;
-  --color-surface-overlay: #251f35;
-  --color-muted: #1e1a2c;
+  /* Core Arcane Palette (Witch Hat Atelier - Parchment & Ink) */
+  --color-bg: #e8e4db;
+  --color-surface: #f4f0e6;
+  --color-surface-raised: #fbf9f4;
+  --color-surface-overlay: rgba(251, 249, 244, 0.95);
+  --color-muted: #dcd7ce;
 
   /* Text Colors */
-  --color-text-primary: #e8dcc8;
-  --color-text-base: #e8dcc8;
-  --color-text-secondary: #c8b8d8;
-  --color-text-muted: #9d8fb5;
-  --color-text-dim: #7a6e90;
-  --color-text-accent: #c9a227;
+  --color-text-primary: #2c2826;
+  --color-text-base: #3a3532;
+  --color-text-secondary: #59524c;
+  --color-text-muted: #827b73;
+  --color-text-dim: #9b948a;
+  --color-text-accent: #a07c34;
 
-  /* Accent & Arcane Glow */
-  --color-accent: #c9a227;
-  --color-accent-hover: #e0b632;
-  --color-accent-muted: rgba(201, 162, 39, 0.18);
-  --color-accent-glow: rgba(201, 162, 39, 0.32);
-  --color-accent-glow-strong: rgba(201, 162, 39, 0.52);
+  /* Accent & Arcane Ink */
+  --color-accent: #a07c34;
+  --color-accent-hover: #8c6a2b;
+  --color-accent-muted: rgba(160, 124, 52, 0.15);
+  --color-accent-glow: transparent;
+  --color-accent-glow-strong: transparent;
 
   /* Glassmorphism */
-  --color-glass: rgba(18, 16, 26, 0.72);
-  --color-glass-raised: rgba(28, 24, 40, 0.85);
-  --color-glass-border: rgba(201, 162, 39, 0.14);
-  --color-glass-border-strong: rgba(201, 162, 39, 0.38);
+  --color-glass: rgba(244, 240, 230, 0.85);
+  --color-glass-raised: rgba(251, 249, 244, 0.95);
+  --color-glass-border: rgba(160, 124, 52, 0.2);
+  --color-glass-border-strong: rgba(160, 124, 52, 0.4);
 
   /* Borders & Highlights */
-  --color-border: rgba(201, 162, 39, 0.12);
-  --color-border-strong: rgba(201, 162, 39, 0.3);
-  --color-border-accent: #c9a227;
-  --color-destructive: #c0472b;
-  --color-destructive-glow: rgba(192, 71, 43, 0.4);
+  --color-border: rgba(44, 40, 38, 0.1);
+  --color-border-strong: rgba(44, 40, 38, 0.25);
+  --color-border-accent: #a07c34;
+  --color-destructive: #8a3028;
+  --color-destructive-glow: transparent;
 
   /* Interactive Elements */
-  --color-primary: #c9a227;
-  --color-primary-hover: #e0b632;
-  --switch-background: #3d3455;
+  --color-primary: #3a3532;
+  --color-primary-hover: #504a46;
+  --switch-background: #dcd7ce;
 
   /* Workshop & Drawing Area Palette */
-  --color-drawing-bg: #f4ede2;
-  --color-toolbar-bg: rgba(28, 24, 40, 0.88);
-  --color-toolbar-item-bg: #221c30;
-  --color-toolbar-item-hover: #352b4c;
-  --color-toolbar-item-active: #c9a227;
-  --color-toolbar-icon: #e8dcc8;
+  --color-drawing-bg: #fffcf8;
+  --color-toolbar-bg: #f4f0e6;
+  --color-toolbar-item-bg: #e8e4db;
+  --color-toolbar-item-hover: #dcd7ce;
+  --color-toolbar-item-active: #a07c34;
+  --color-toolbar-icon: #2c2826;
 
-  /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.55);
-  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.75);
-  --shadow-panel: 0 8px 40px rgba(0, 0, 0, 0.65), 0 0 60px rgba(60, 20, 110, 0.12), inset 0 0 0 1px var(--color-glass-border);
-  --shadow-glow: 0 0 22px var(--color-accent-glow), 0 3px 10px rgba(0, 0, 0, 0.5);
-  --shadow-glow-hover: 0 0 38px var(--color-accent-glow-strong), 0 4px 16px rgba(0, 0, 0, 0.55);
+  /* Glyph Hotbar*/
+  --color-glyph-hotbar: #a9b5c7;
+
+  /* Shadows (No colored glowing shadow boxes) */
+  --shadow-sm: 0 1px 3px rgba(44, 40, 38, 0.08);
+  --shadow-md: 0 4px 12px rgba(44, 40, 38, 0.06);
+  --shadow-lg: 0 8px 24px rgba(44, 40, 38, 0.08);
+  --shadow-panel: 0 8px 24px rgba(44, 40, 38, 0.05), inset 0 0 0 1px var(--color-glass-border);
+  --shadow-glow: none;
+  --shadow-glow-hover: none;
 
   /* Spacing Scale */
   --space-xs: 0.375rem;

@@ -21,17 +21,24 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #d4af37 0%, #aa820a 100%);
-  color: #12101a;
-  border-color: #e6c555;
-  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.35);
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.4);
+  background: linear-gradient(135deg, rgba(44, 38, 30, 0.95), rgba(28, 24, 20, 0.98));
+  color: #fff9ed;
+  border: 1.5px solid var(--color-border-strong, #c8bead);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  text-shadow: none;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #e6c555 0%, #c49714 100%);
+  background: linear-gradient(135deg, rgba(56, 48, 38, 0.98), rgba(38, 32, 26, 1));
+  border-color: rgba(255, 255, 255, 0.35);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .btn-secondary {
@@ -68,4 +75,55 @@
 .btn-icon-lg {
   padding: 0.85rem;
   border-radius: var(--radius-full);
+}
+
+/* ============================================
+   REUSABLE PILL COMPONENTS
+   Matching element filter pill design
+   ============================================ */
+.pill,
+.ui-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 11px;
+  height: 28px;
+  min-height: 28px;
+  line-height: 1;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  user-select: none;
+  box-sizing: border-box;
+  transition: all 0.15s ease;
+}
+
+.pill:hover,
+.ui-pill:hover {
+  border-color: var(--color-text-muted);
+  color: var(--color-text-primary);
+  background: #ffffff;
+}
+
+.pill.active,
+.ui-pill.active {
+  background: var(--color-primary);
+  color: var(--color-surface-raised);
+  border-color: var(--color-primary);
+}
+
+.pill-icon,
+.ui-pill-icon {
+  width: 28px;
+  min-width: 28px;
+  padding: 0;
+  border-radius: 9999px;
 }
