@@ -1,0 +1,199 @@
+{
+  "texture": "spritesheet",
+  "frameWidth": 256,
+  "frameHeight": 256,
+  "totalFrames": 8,
+  "phaserLoadCode": "this.load.spritesheet('player_idle', 'path/to/spritesheet.png', { frameWidth: 256, frameHeight: 256, margin: 0, spacing: 0 });",
+  "padding": {
+    "unit": "game pixels",
+    "frameSize": 256,
+    "targetCharacterHeight": 200,
+    "bottomGroundMargin": 26,
+    "jumpHeadroom": 31,
+    "groundBaselineY": 231,
+    "horizontalCenterPercent": 50,
+    "topPadding": 31,
+    "bottomPadding": 26,
+    "leftPadding": 89,
+    "rightPadding": 88,
+    "masterCanvas1024Measurements": {
+      "canvasSize": 1024,
+      "characterHeightPx": 799,
+      "bottomGroundMarginPx": 102,
+      "jumpHeadroomPx": 123,
+      "groundBaselineYPx": 922
+    },
+    "hitboxRecommendation": {
+      "note": "Apply these hitbox sizes & offsets in Phaser so character feet sit flush on the ground without hovering:",
+      "hitboxWidth": 80,
+      "hitboxHeight": 200,
+      "offsetX": 88,
+      "offsetY": 30,
+      "offsetXFormula": "(frameWidth - hitboxWidth) / 2",
+      "offsetYFormula": "frameHeight - hitboxHeight - bottomGroundMargin",
+      "phaserSnippet": "this.player.body.setSize(80, 200); this.player.body.setOffset(88, 30);"
+    }
+  },
+  "frames": [
+    {
+      "index": 0,
+      "name": "Idle_rotations_8dir-ezgif.com-gif-to-sprite-converter (2)_frame_01",
+      "x": 0,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 89,
+        "y": 34,
+        "width": 79,
+        "height": 196
+      },
+      "padding": {
+        "top": 34,
+        "bottom": 26,
+        "left": 89,
+        "right": 88
+      }
+    },
+    {
+      "index": 1,
+      "name": "Idle_rotations_8dir-ezgif.com-gif-to-sprite-converter (2)_frame_02",
+      "x": 256,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 46,
+        "y": 16,
+        "width": 39,
+        "height": 99
+      },
+      "padding": {
+        "top": 16,
+        "bottom": 141,
+        "left": 46,
+        "right": 171
+      }
+    },
+    {
+      "index": 2,
+      "name": "Idle_rotations_8dir-ezgif.com-gif-to-sprite-converter (2)_frame_03",
+      "x": 512,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 50,
+        "y": 15,
+        "width": 28,
+        "height": 100
+      },
+      "padding": {
+        "top": 15,
+        "bottom": 141,
+        "left": 50,
+        "right": 178
+      }
+    },
+    {
+      "index": 3,
+      "name": "Idle_rotations_8dir-ezgif.com-gif-to-sprite-converter (2)_frame_04",
+      "x": 768,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 47,
+        "y": 16,
+        "width": 37,
+        "height": 99
+      },
+      "padding": {
+        "top": 16,
+        "bottom": 141,
+        "left": 47,
+        "right": 172
+      }
+    },
+    {
+      "index": 4,
+      "name": "Idle_rotations_8dir-ezgif.com-gif-to-sprite-converter (2)_frame_05",
+      "x": 1024,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 46,
+        "y": 18,
+        "width": 37,
+        "height": 97
+      },
+      "padding": {
+        "top": 18,
+        "bottom": 141,
+        "left": 46,
+        "right": 173
+      }
+    },
+    {
+      "index": 5,
+      "name": "Idle_rotations_8dir-ezgif.com-gif-to-sprite-converter (2)_frame_06",
+      "x": 1280,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 45,
+        "y": 16,
+        "width": 37,
+        "height": 99
+      },
+      "padding": {
+        "top": 16,
+        "bottom": 141,
+        "left": 45,
+        "right": 174
+      }
+    },
+    {
+      "index": 6,
+      "name": "Idle_rotations_8dir-ezgif.com-gif-to-sprite-converter (2)_frame_07",
+      "x": 1536,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 50,
+        "y": 15,
+        "width": 29,
+        "height": 100
+      },
+      "padding": {
+        "top": 15,
+        "bottom": 141,
+        "left": 50,
+        "right": 177
+      }
+    },
+    {
+      "index": 7,
+      "name": "Idle_rotations_8dir-ezgif.com-gif-to-sprite-converter (2)_frame_08",
+      "x": 1792,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 43,
+        "y": 16,
+        "width": 39,
+        "height": 99
+      },
+      "padding": {
+        "top": 16,
+        "bottom": 141,
+        "left": 43,
+        "right": 174
+      }
+    }
+  ]
+}
