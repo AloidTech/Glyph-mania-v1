@@ -8,16 +8,16 @@ export interface TrainingExample {
   vec: number[]; // 512-dim normalized feature vector
   thumb: string; // PNG/WebP Data URL or cloud storage URL
   createdAt: number;
-  firstModelTrainedId?: string | null; // ID of the model where this exemplar was first trained
-  lastModelTrainedId?: string | null;  // ID of the model where this exemplar was most recently trained
+  modelIds?: string[]; // Array of model IDs this exemplar was trained with
+  firstModelTrainedId?: string;
+  lastModelTrainedId?: string;
   synced?: boolean;
 }
 
 export interface TrainingExampleInput {
   vec: number[] | Float32Array;
   thumb: string;
-  firstModelTrainedId?: string | null;
-  lastModelTrainedId?: string | null;
+  modelIds?: string[];
 }
 
 export interface TrainingExamplesBySigil {

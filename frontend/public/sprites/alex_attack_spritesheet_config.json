@@ -1,0 +1,259 @@
+{
+  "texture": "spritesheet",
+  "frameWidth": 256,
+  "frameHeight": 256,
+  "totalFrames": 11,
+  "phaserLoadCode": "this.load.spritesheet('player_idle', 'path/to/spritesheet.png', { frameWidth: 256, frameHeight: 256, margin: 0, spacing: 0 });",
+  "padding": {
+    "unit": "game pixels",
+    "frameSize": 256,
+    "targetCharacterHeight": 200,
+    "bottomGroundMargin": 26,
+    "jumpHeadroom": 31,
+    "groundBaselineY": 231,
+    "horizontalCenterPercent": 50,
+    "topPadding": 31,
+    "bottomPadding": 26,
+    "leftPadding": 90,
+    "rightPadding": 87,
+    "masterCanvas1024Measurements": {
+      "canvasSize": 1024,
+      "characterHeightPx": 799,
+      "bottomGroundMarginPx": 102,
+      "jumpHeadroomPx": 123,
+      "groundBaselineYPx": 922
+    },
+    "hitboxRecommendation": {
+      "note": "Apply these hitbox sizes & offsets in Phaser so character feet sit flush on the ground without hovering:",
+      "hitboxWidth": 80,
+      "hitboxHeight": 200,
+      "offsetX": 88,
+      "offsetY": 30,
+      "offsetXFormula": "(frameWidth - hitboxWidth) / 2",
+      "offsetYFormula": "frameHeight - hitboxHeight - bottomGroundMargin",
+      "phaserSnippet": "this.player.body.setSize(80, 200); this.player.body.setOffset(88, 30);"
+    }
+  },
+  "frames": [
+    {
+      "index": 0,
+      "name": "aiming_v1_walk_spritesheet_frame_01",
+      "x": 0,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 90,
+        "y": 31,
+        "width": 79,
+        "height": 199
+      },
+      "padding": {
+        "top": 31,
+        "bottom": 26,
+        "left": 90,
+        "right": 87
+      }
+    },
+    {
+      "index": 1,
+      "name": "aiming_v1_walk_spritesheet_frame_02",
+      "x": 256,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 90,
+        "y": 31,
+        "width": 79,
+        "height": 199
+      },
+      "padding": {
+        "top": 31,
+        "bottom": 26,
+        "left": 90,
+        "right": 87
+      }
+    },
+    {
+      "index": 2,
+      "name": "aiming_v1_walk_spritesheet_frame_03",
+      "x": 512,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 90,
+        "y": 31,
+        "width": 79,
+        "height": 199
+      },
+      "padding": {
+        "top": 31,
+        "bottom": 26,
+        "left": 90,
+        "right": 87
+      }
+    },
+    {
+      "index": 3,
+      "name": "aiming_v1_walk_spritesheet_frame_04",
+      "x": 768,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 89,
+        "y": 32,
+        "width": 80,
+        "height": 198
+      },
+      "padding": {
+        "top": 32,
+        "bottom": 26,
+        "left": 89,
+        "right": 87
+      }
+    },
+    {
+      "index": 4,
+      "name": "aiming_v1_walk_spritesheet_frame_05",
+      "x": 1024,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 89,
+        "y": 32,
+        "width": 83,
+        "height": 198
+      },
+      "padding": {
+        "top": 32,
+        "bottom": 26,
+        "left": 89,
+        "right": 84
+      }
+    },
+    {
+      "index": 5,
+      "name": "aiming_v1_walk_spritesheet_frame_06",
+      "x": 1280,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 89,
+        "y": 32,
+        "width": 82,
+        "height": 198
+      },
+      "padding": {
+        "top": 32,
+        "bottom": 26,
+        "left": 89,
+        "right": 85
+      }
+    },
+    {
+      "index": 6,
+      "name": "aiming_v1_walk_spritesheet_frame_07",
+      "x": 1536,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 87,
+        "y": 31,
+        "width": 98,
+        "height": 199
+      },
+      "padding": {
+        "top": 31,
+        "bottom": 26,
+        "left": 87,
+        "right": 71
+      }
+    },
+    {
+      "index": 7,
+      "name": "aiming_v1_walk_spritesheet_frame_08",
+      "x": 1792,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 88,
+        "y": 31,
+        "width": 103,
+        "height": 199
+      },
+      "padding": {
+        "top": 31,
+        "bottom": 26,
+        "left": 88,
+        "right": 65
+      }
+    },
+    {
+      "index": 8,
+      "name": "aiming_v1_walk_spritesheet_frame_09",
+      "x": 2048,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 88,
+        "y": 31,
+        "width": 104,
+        "height": 199
+      },
+      "padding": {
+        "top": 31,
+        "bottom": 26,
+        "left": 88,
+        "right": 64
+      }
+    },
+    {
+      "index": 9,
+      "name": "aiming_v1_walk_spritesheet_frame_10",
+      "x": 2304,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 88,
+        "y": 31,
+        "width": 105,
+        "height": 199
+      },
+      "padding": {
+        "top": 31,
+        "bottom": 26,
+        "left": 88,
+        "right": 63
+      }
+    },
+    {
+      "index": 10,
+      "name": "aiming_v1_walk_spritesheet_frame_11",
+      "x": 2560,
+      "y": 0,
+      "width": 256,
+      "height": 256,
+      "contentBounds": {
+        "x": 90,
+        "y": 31,
+        "width": 104,
+        "height": 199
+      },
+      "padding": {
+        "top": 31,
+        "bottom": 26,
+        "left": 90,
+        "right": 62
+      }
+    }
+  ]
+}

@@ -12,8 +12,8 @@ export type Direction = 'up' | 'down' | 'left' | 'right';
 // ===== Sigil Asset References =====
 
 export interface SigilAssetRefs {
-  svgPath: string; // React UI — path to canonical SVG (e.g. '/sigils/svg/eff-fire.svg')
-  textureKey: string; // Phaser — atlas frame name (e.g. 'eff-fire')
+  coverAsset: string; // Standardized cover asset URL or data URL
+  textureKey?: string; // Phaser — atlas frame name (e.g. 'eff-fire')
 }
 
 // ===== Sigil =====
@@ -90,8 +90,8 @@ export interface GlyphBase {
   tier: number;
   isPublic?: boolean;
   schemaId?: string;
+  coverAsset?: string;
   composition: GlyphComposition;
-
 }
 
 export interface WorkshopGlyph extends GlyphBase {

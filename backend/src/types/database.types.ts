@@ -271,9 +271,8 @@ export type Database = {
       training_examples: {
         Row: {
           created_at: string
-          first_model_trained_id: string | null
           id: string
-          last_model_trained_id: string | null
+          model_ids: string[]
           sigil_id: string
           thumb: string
           updated_at: string
@@ -281,9 +280,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          first_model_trained_id?: string | null
           id: string
-          last_model_trained_id?: string | null
+          model_ids?: string[]
           sigil_id: string
           thumb: string
           updated_at?: string
@@ -291,29 +289,14 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          first_model_trained_id?: string | null
           id?: string
-          last_model_trained_id?: string | null
+          model_ids?: string[]
           sigil_id?: string
           thumb?: string
           updated_at?: string
           vec?: number[]
         }
         Relationships: [
-          {
-            foreignKeyName: "training_examples_first_model_trained_id_fkey"
-            columns: ["first_model_trained_id"]
-            isOneToOne: false
-            referencedRelation: "saved_models"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "training_examples_last_model_trained_id_fkey"
-            columns: ["last_model_trained_id"]
-            isOneToOne: false
-            referencedRelation: "saved_models"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "training_examples_sigil_id_fkey"
             columns: ["sigil_id"]

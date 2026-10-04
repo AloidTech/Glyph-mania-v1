@@ -9,13 +9,15 @@ interface CreateSigilRequest {
   description: string;
   tier: number;
   cover_asset?: string;
-  svg_path?: string;
   texture_key: string;
-  type: 'effector' | 'augmentor';
+  type?: 'effector' | 'augmentor';
   element?: string;
   augmentor_type?: 'position' | 'form';
   form_type?: string;
   coverImageBase64?: string;
+  sigil_type?: 'effector' | 'form' | 'position';
+  element_id?: string;
+  base_hit_damage?: number;
 }
 
 const corsHeaders = {
@@ -49,22 +51,32 @@ serve(async (req: Request) => {
 
     // 2. Parse Request
     const payload = await req.json() as CreateSigilRequest;
-    
+
     // 3. Validation Logic
-    if (!payload.label || !payload.type) {
-      throw new Error("Label and type are required.");
+    if (!payload.label) {
+      throw new Error("Label is required.");
     }
 
-    // Ensure the payload strictly adheres to the Discriminated Union rules
-    if (payload.type === 'effector') {
-      if (!payload.element) throw new Error("Effectors must have an element.");
-      payload.augmentor_type = undefined;
-      payload.form_type = undefined;
-    } else if (payload.type === 'augmentor') {
-      if (!payload.augmentor_type) throw new Error("Augmentors must specify an augmentor_type (position or form).");
-      payload.element = undefined;
-      if (payload.augmentor_type === 'position') {
+    let derivedSigilType = payload.sigil_type;
+
+    if (!derivedSigilType) {
+      if (!payload.type) {
+        throw new Error("Either sigil_type or type is required.");
+      }
+
+      // Ensure the payload strictly adheres to the Discriminated Union rules
+      if (payload.type === 'effector') {
+        if (!payload.element) throw new Error("Effectors must have an element.");
+        payload.augmentor_type = undefined;
         payload.form_type = undefined;
+        derivedSigilType = 'effector';
+      } else if (payload.type === 'augmentor') {
+        if (!payload.augmentor_type) throw new Error("Augmentors must specify an augmentor_type (position or form).");
+        payload.element = undefined;
+        if (payload.augmentor_type === 'position') {
+          payload.form_type = undefined;
+        }
+        derivedSigilType = payload.augmentor_type;
       }
     }
 
@@ -74,14 +86,14 @@ serve(async (req: Request) => {
     const fallbackId = `${prefix}-${cleanLabel}-${Date.now().toString(36).slice(-4)}`;
     const sigilId = payload.id || fallbackId;
 
-    let coverAsset = payload.cover_asset || payload.svg_path || '/sigils/svg/eff-fire.svg';
+    let coverAsset = payload.cover_asset || '/sigils/svg/eff-fire.svg';
     if (payload.coverImageBase64) {
       try {
         const base64Data = payload.coverImageBase64.replace(/^data:image\/\w+;base64,/, "");
         const imageBytes = decode(base64Data);
-        
+
         const filePath = `sigils/${sigilId}.png`;
-        
+
         const { error: uploadError } = await supabaseClient.storage
           .from('assets')
           .upload(filePath, imageBytes, {
@@ -113,6 +125,9 @@ serve(async (req: Request) => {
       element: payload.element,
       augmentor_type: payload.augmentor_type,
       form_type: payload.form_type,
+      sigil_type: derivedSigilType,
+      element_id: payload.element_id || (payload.element ? payload.element.toUpperCase() : null),
+      base_hit_damage: payload.base_hit_damage || 100,
     };
 
     const { data: newSigil, error: saveError } = await supabaseClient

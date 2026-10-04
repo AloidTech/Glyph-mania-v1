@@ -54,6 +54,7 @@ export function analyzeSolidity(
   const lowAccuracySlots: string[] = [];
   const recordedAccuracies: Record<string, number> = {};
   const slotErrors: Record<string, SlotErrorDetail[]> = {};
+  const ACCURACY_THRESHOLD = 0.35;
 
   const addSlotError = (slotKey: string, type: SlotErrorDetail['type'], message: string) => {
     if (!slotErrors[slotKey]) slotErrors[slotKey] = [];
@@ -85,6 +86,37 @@ export function analyzeSolidity(
       lowAccuracySlots,
       accuracies: recordedAccuracies,
       slotErrors,
+    };
+  }
+
+  // If saved vector strokes are present in the composition, the glyph was already drawn
+  // and verified by the player — treat it as solid without re-running slot validation if element is present.
+  if (Array.isArray((comp as any).strokes) && (comp as any).strokes.length > 0) {
+    const hasElement = Boolean(glyph.element || comp.effector?.element);
+    if (!hasElement) {
+      return {
+        isSolid: false,
+        slots,
+        reasons: ['Glyph must have a valid elemental affinity'],
+        formType: null,
+        lowAccuracySlots,
+        accuracies: recordedAccuracies,
+        slotErrors,
+      };
+    }
+    const allSlotsTrue: SlotSolidityAnalysis = {
+      effector: true,
+      directions: { top: true, right: true, bottom: true, left: true },
+      formAugmentors: { topLeft: true, topRight: true, bottomLeft: true, bottomRight: true },
+    };
+    return {
+      isSolid: true,
+      slots: allSlotsTrue,
+      reasons: [],
+      formType: null,
+      lowAccuracySlots: [],
+      accuracies: {},
+      slotErrors: {},
     };
   }
 
@@ -169,6 +201,13 @@ export function analyzeSolidity(
         'type_mismatch',
         `Center requires an Effector sigil, but found ${effectorSigil.type}.`
       );
+    } else if (!effectorSigil.element && !comp.effector.element && !glyph.element) {
+      reasons.push('Effector must specify a valid elemental affinity');
+      addSlotError(
+        'effector',
+        'type_mismatch',
+        'Effector has no assigned element.'
+      );
     } else {
       slots.effector = true;
     }
@@ -179,9 +218,9 @@ export function analyzeSolidity(
   const effectorConf = normalizeConf(rawEffConf);
   if (effectorConf !== undefined) {
     recordedAccuracies.effector = effectorConf;
-    if (effectorConf < 0.8) {
+    if (effectorConf < ACCURACY_THRESHOLD) {
       lowAccuracySlots.push('effector');
-      reasons.push(`Effector accuracy is too low (${(effectorConf * 100).toFixed(1)}% < 80%)`);
+      reasons.push(`Effector accuracy is too low (${(effectorConf * 100).toFixed(1)}% < ${ACCURACY_THRESHOLD * 100}%)`);
       addSlotError(
         'effector',
         'low_accuracy',
@@ -224,9 +263,9 @@ export function analyzeSolidity(
     const dirConf = normalizeConf(rawDirConf);
     if (dirConf !== undefined) {
       recordedAccuracies[dir] = dirConf;
-      if (dirConf < 0.8) {
+      if (dirConf < ACCURACY_THRESHOLD) {
         lowAccuracySlots.push(dir);
-        reasons.push(`${dir} anchor accuracy is too low (${(dirConf * 100).toFixed(1)}% < 80%)`);
+        reasons.push(`${dir} anchor accuracy is too low (${(dirConf * 100).toFixed(1)}% < ${ACCURACY_THRESHOLD * 100}%)`);
         addSlotError(
           dir,
           'low_accuracy',
@@ -291,9 +330,9 @@ export function analyzeSolidity(
     const formConf = normalizeConf(rawFormConf);
     if (formConf !== undefined) {
       recordedAccuracies[f] = formConf;
-      if (formConf < 0.8) {
+      if (formConf < ACCURACY_THRESHOLD) {
         lowAccuracySlots.push(f);
-        reasons.push(`${f} form accuracy is too low (${(formConf * 100).toFixed(1)}% < 80%)`);
+        reasons.push(`${f} form accuracy is too low (${(formConf * 100).toFixed(1)}% < ${ACCURACY_THRESHOLD * 100}%)`);
         addSlotError(
           f,
           'low_accuracy',

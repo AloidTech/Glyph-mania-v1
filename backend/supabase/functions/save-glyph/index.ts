@@ -58,7 +58,7 @@ serve(async (req: Request) => {
     // 1. Fetch sigils to resolve types (effector vs augmentor, formType, etc.)
     const { data: sigilsData, error: sigilsError } = await supabaseClient
       .from('sigils')
-      .select('id, type, augmentor_type, form_type, element');
+      .select('id, label, type, augmentor_type, form_type, element');
 
     if (sigilsError) {
       throw new Error(`Failed to load sigils for validation: ${sigilsError.message}`);
@@ -67,6 +67,7 @@ serve(async (req: Request) => {
     const sigilLookup = (sigilsData || []).reduce((acc: any, s: any) => {
       acc[s.id] = {
         id: s.id,
+        label: s.label,
         type: s.type,
         augmentorType: s.augmentor_type,
         formType: s.form_type,

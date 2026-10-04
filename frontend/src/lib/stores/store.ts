@@ -43,6 +43,7 @@ export interface GameState {
   settings: SettingsState;
   selectedTestingGlyphs: any[];
   testingGroundMode: 'ISOMETRIC' | 'OBLIQUE' | 'SIDE_VIEW';
+  glyphHeldState: 'none' | 'aim' | 'place' | 'held';
 
   // Navigation & Actions
   setScreen: (screen: ScreenState) => void;
@@ -52,6 +53,7 @@ export interface GameState {
   setSelectedTestingGlyphs: (glyphs: any[]) => void;
   startTestingGround: (glyphs: any[]) => void;
   setTestingGroundMode: (mode: 'ISOMETRIC' | 'OBLIQUE' | 'SIDE_VIEW') => void;
+  setGlyphHeldState: (state: 'none' | 'aim' | 'place' | 'held') => void;
 }
 
 export interface WorkShopState {
@@ -118,6 +120,7 @@ export const useGameStore = create<GameState>()(
       activeScreen: 'MAIN_MENU',
       selectedTestingGlyphs: [],
       testingGroundMode: 'SIDE_VIEW',
+      glyphHeldState: 'none',
 
       settings: {
         masterVolume: 80,
@@ -145,6 +148,7 @@ export const useGameStore = create<GameState>()(
       }),
 
       setTestingGroundMode: (mode) => set({ testingGroundMode: mode }),
+      setGlyphHeldState: (state) => set({ glyphHeldState: state }),
     }),
     {
       name: 'game-store-storage',

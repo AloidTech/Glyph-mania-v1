@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import { TrainingExample } from '../../types/training_types';
 import { supabase } from '../supabase/supabase';
+import { fetchRemoteTrainingExamples } from '../apis/api';
 export type { TrainingExample };
 
 // Zero-dependency asynchronous IndexedDB storage engine for Zustand
@@ -135,12 +136,15 @@ export interface TrainingStoreState {
   trainedClassLabels: string[];
   lastTrainedAt: number | null;
   isModelUnsaved: boolean;
+  isLoadingRemote: boolean;
 
+  loadRemoteExamples: () => Promise<TrainingExample[]>;
   addExample: (sigilId: string, example: { vec: number[] | Float32Array; thumb: string }) => Promise<void>;
-  removeExample: (sigilId: string, exampleId: string) => void;
-  clearExamplesForSigil: (sigilId: string) => void;
+  removeExample: (sigilId: string, exampleId: string) => Promise<void> | void;
+  clearExamplesForSigil: (sigilId: string) => Promise<void> | void;
   clearAll: () => void;
   migrateAllExamplesToStorage: () => Promise<void>;
+  syncAllExamplesToSupabase: () => Promise<{ total: number; synced: number }>;
   getExamples: (sigilId: string) => TrainingExample[];
   getExamplesCount: (sigilId: string) => number;
   getTotalExamplesCount: () => number;
@@ -169,6 +173,36 @@ export const useTrainingStore = create<TrainingStoreState>()(
       trainedClassLabels: [],
       lastTrainedAt: null,
       isModelUnsaved: false,
+      isLoadingRemote: false,
+
+      loadRemoteExamples: async () => {
+        set({ isLoadingRemote: true });
+        try {
+          const remoteList = await fetchRemoteTrainingExamples();
+          const grouped: Record<string, TrainingExample[]> = {};
+          for (const ex of remoteList) {
+            if (!grouped[ex.sigilId]) grouped[ex.sigilId] = [];
+            grouped[ex.sigilId].push(ex);
+          }
+
+          // Merge with any unsynced local drafts so offline work is never lost
+          const currentLocal = get().examples;
+          const merged: Record<string, TrainingExample[]> = { ...grouped };
+          for (const [sigilId, localList] of Object.entries(currentLocal)) {
+            const unsynced = localList.filter((l) => !l.synced && !merged[sigilId]?.some((r) => r.id === l.id));
+            if (unsynced.length > 0) {
+              merged[sigilId] = [...(merged[sigilId] || []), ...unsynced];
+            }
+          }
+
+          set({ examples: merged, isLoadingRemote: false });
+          return remoteList;
+        } catch (err) {
+          console.error('[training_store] Failed to load remote examples from Supabase:', err);
+          set({ isLoadingRemote: false });
+          throw err;
+        }
+      },
 
       setIsTraining: (isTraining) => set({ isTraining }),
       setTrainingProgress: (trainingProgress) => set({ trainingProgress }),
@@ -209,8 +243,8 @@ export const useTrainingStore = create<TrainingStoreState>()(
           vec: vecArray,
           thumb: finalThumb,
           createdAt: Date.now(),
-          firstModelTrainedId: null,
-          lastModelTrainedId: null,
+          modelIds: [],
+          synced: true,
         };
 
         set((state) => ({
@@ -219,6 +253,21 @@ export const useTrainingStore = create<TrainingStoreState>()(
             [sigilId]: [...(state.examples[sigilId] || []), newExample],
           },
         }));
+
+        // Immediately upload example to Supabase database table
+        try {
+          await supabase.from('training_examples').insert({
+            id,
+            sigil_id: sigilId,
+            vec: vecArray,
+            thumb: finalThumb,
+            model_ids: [],
+            created_at: new Date(newExample.createdAt).toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+        } catch (dbErr) {
+          console.error('Failed to insert example into Supabase DB:', dbErr);
+        }
       },
 
       tagExamplesWithModel: (modelId, sigilIds) => {
@@ -231,18 +280,28 @@ export const useTrainingStore = create<TrainingStoreState>()(
               updated[sId] = list;
               continue;
             }
-            updated[sId] = list.map((ex) => ({
-              ...ex,
-              firstModelTrainedId: ex.firstModelTrainedId || modelId,
-              lastModelTrainedId: modelId,
-            }));
+            updated[sId] = list.map((ex) => {
+              // Backward-compatible hydration of modelIds from old scalar fields if present
+              const existingIds: string[] = Array.isArray(ex.modelIds)
+                ? [...ex.modelIds]
+                : ([(ex as any).firstModelTrainedId, (ex as any).lastModelTrainedId].filter(Boolean) as string[]);
+
+              if (!existingIds.includes(modelId)) {
+                existingIds.push(modelId);
+              }
+
+              return {
+                ...ex,
+                modelIds: existingIds,
+              };
+            });
           }
 
           return { examples: updated };
         });
       },
 
-      removeExample: (sigilId, exampleId) => {
+      removeExample: async (sigilId, exampleId) => {
         set((state) => {
           const list = state.examples[sigilId] || [];
           const updated = list.filter((ex) => ex.id !== exampleId);
@@ -253,15 +312,30 @@ export const useTrainingStore = create<TrainingStoreState>()(
             },
           };
         });
+
+        // Delete from Supabase DB and storage
+        try {
+          await supabase.from('training_examples').delete().eq('id', exampleId);
+          const filePath = `training/${sigilId}/${exampleId}.png`;
+          await supabase.storage.from('assets').remove([filePath]);
+        } catch (delErr) {
+          console.error('Failed to delete training example from Supabase:', delErr);
+        }
       },
 
-      clearExamplesForSigil: (sigilId) => {
+      clearExamplesForSigil: async (sigilId) => {
         set((state) => ({
           examples: {
             ...state.examples,
             [sigilId]: [],
           },
         }));
+
+        try {
+          await supabase.from('training_examples').delete().eq('sigil_id', sigilId);
+        } catch (delErr) {
+          console.error('Failed to clear training examples from Supabase:', delErr);
+        }
       },
 
       clearAll: () => {
@@ -304,6 +378,106 @@ export const useTrainingStore = create<TrainingStoreState>()(
         console.log(`Migration complete. Successfully moved ${migratedCount} exemplars to Supabase Storage.`);
       },
 
+      syncAllExamplesToSupabase: async () => {
+        const state = get();
+        const updatedExamples = { ...state.examples };
+        let syncedCount = 0;
+        const batch: any[] = [];
+
+        // Legacy UUID to semantic ID map to guarantee clean foreign key relational integrity
+        const uuidToSemanticId: Record<string, string> = {
+          '9831dbb9-718c-4961-b3f0-458d25295364': 'eff-earth',
+          'dc4cec64-ab17-49a3-930e-7276310244a3': 'aug-form-whirl',
+          'b15c9c2c-4ed9-483a-8fbd-3f79a48ef1a6': 'aug-position',
+          'e0115e15-63d2-49f6-98b4-5d50c69b0f49': 'aug-form-compress',
+          '6eed2dce-5968-4448-a8b6-72566a990f6b': 'eff-air',
+          '78b26b48-3879-4e3a-b30c-71eb78dd8860': 'eff-water',
+          '7533058c-3092-4bfe-857b-5bfc3a3fbd16': 'aug-form-dash',
+          'aug-condense': 'aug-form-condense',
+        };
+
+        const remappedStore: Record<string, TrainingExample[]> = {};
+
+        for (const [rawSigilId, list] of Object.entries(updatedExamples)) {
+          const cleanSigilId = rawSigilId.trim();
+          const targetSigilId = uuidToSemanticId[cleanSigilId] || cleanSigilId;
+
+          const updatedList: TrainingExample[] = [];
+
+          for (const ex of list) {
+            let finalThumb = ex.thumb;
+            // Upload base64 thumb to Supabase Storage if not already uploaded
+            if (ex.thumb && ex.thumb.startsWith('data:image')) {
+              try {
+                const res = await fetch(ex.thumb);
+                const blob = await res.blob();
+                const filePath = `training/${targetSigilId}/${ex.id}.png`;
+                const { error: uploadError } = await supabase.storage
+                  .from('assets')
+                  .upload(filePath, blob, { contentType: 'image/png', upsert: true });
+
+                if (!uploadError) {
+                  const { data: publicUrlData } = supabase.storage.from('assets').getPublicUrl(filePath);
+                  finalThumb = publicUrlData.publicUrl;
+                }
+              } catch (e) {
+                console.warn(`Could not upload thumb for example ${ex.id}:`, e);
+              }
+            }
+
+            // Hydrate modelIds array from legacy fields if needed
+            const modelIds: string[] = Array.isArray(ex.modelIds)
+              ? ex.modelIds
+              : ([(ex as any).firstModelTrainedId, (ex as any).lastModelTrainedId].filter(Boolean) as string[]);
+
+            const converted: TrainingExample = {
+              ...ex,
+              sigilId: targetSigilId,
+              thumb: finalThumb,
+              modelIds,
+              synced: true,
+            };
+
+            updatedList.push(converted);
+
+            // Stage for Supabase database upsert
+            batch.push({
+              id: ex.id,
+              sigil_id: targetSigilId,
+              vec: Array.from(ex.vec),
+              thumb: finalThumb,
+              model_ids: modelIds,
+              created_at: new Date(ex.createdAt).toISOString(),
+              updated_at: new Date().toISOString(),
+            });
+          }
+
+          if (!remappedStore[targetSigilId]) {
+            remappedStore[targetSigilId] = [];
+          }
+          remappedStore[targetSigilId].push(...updatedList);
+        }
+
+        // Batch upsert to Supabase in chunks of 50
+        const chunkSize = 50;
+        for (let i = 0; i < batch.length; i += chunkSize) {
+          const chunk = batch.slice(i, i + chunkSize);
+          const { error: upsertErr } = await supabase
+            .from('training_examples')
+            .upsert(chunk, { onConflict: 'id' });
+
+          if (upsertErr) {
+            console.error('Failed to upsert chunk to training_examples in Supabase:', upsertErr);
+          } else {
+            syncedCount += chunk.length;
+          }
+        }
+
+        set({ examples: remappedStore });
+        console.log(`Sync complete! ${syncedCount} of ${batch.length} examples saved to Supabase.`);
+        return { total: batch.length, synced: syncedCount };
+      },
+
       getExamples: (sigilId) => {
         return get().examples[sigilId] || [];
       },
@@ -337,8 +511,7 @@ export const useTrainingStore = create<TrainingStoreState>()(
               vec: Array.from(item.vec),
               thumb: item.thumb,
               createdAt: Date.now(),
-              firstModelTrainedId: (item as any).firstModelTrainedId || null,
-              lastModelTrainedId: (item as any).lastModelTrainedId || null,
+              modelIds: (item as any).modelIds || ([(item as any).firstModelTrainedId, (item as any).lastModelTrainedId].filter(Boolean) as string[]),
             }));
             
             if (!merged[sigilId]) merged[sigilId] = [];
@@ -364,10 +537,53 @@ export const useTrainingStore = create<TrainingStoreState>()(
   )
 );
 
-// Expose the migration script to the browser console for easy execution
+// Expose the migration and cloud sync scripts to the browser console for easy execution
 if (typeof window !== 'undefined') {
   (window as any).migrateMLStorage = () => {
     console.log("Starting ML Exemplar Migration to Supabase Storage...");
     useTrainingStore.getState().migrateAllExamplesToStorage();
   };
+  (window as any).syncMLToSupabase = async () => {
+    console.log("Starting ML Exemplar Sync to Supabase...");
+    return await useTrainingStore.getState().syncAllExamplesToSupabase();
+  };
 }
+
+// ===== Supabase Realtime Subscription for Training Examples =====
+let trainingExamplesChannel: ReturnType<typeof supabase.channel> | null = null;
+
+export function subscribeToRealtimeTrainingExamples(): () => void {
+  if (trainingExamplesChannel) {
+    supabase.removeChannel(trainingExamplesChannel);
+  }
+
+  trainingExamplesChannel = supabase
+    .channel('training-examples-realtime')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'training_examples' },
+      async (payload) => {
+        console.log('[training_store] Realtime training_examples change:', payload.eventType);
+        try {
+          await useTrainingStore.getState().loadRemoteExamples();
+        } catch (err) {
+          console.error('[training_store] Failed to reload examples after realtime event:', err);
+        }
+      }
+    )
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        console.log('[training_store] Realtime training_examples subscription active.');
+      } else if (status === 'CHANNEL_ERROR') {
+        console.error('[training_store] Realtime training_examples subscription error.');
+      }
+    });
+
+  return () => {
+    if (trainingExamplesChannel) {
+      supabase.removeChannel(trainingExamplesChannel);
+      trainingExamplesChannel = null;
+    }
+  };
+}
+

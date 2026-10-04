@@ -12,44 +12,59 @@ export type Direction = 'up' | 'down' | 'left' | 'right';
 // ===== Sigil Asset References =====
 
 export interface SigilAssetRefs {
-    svgPath: string;       // React UI — path to canonical SVG (e.g. '/sigils/svg/eff-fire.svg')
-    textureKey: string;    // Phaser — atlas frame name (e.g. 'eff-fire')
+    coverAsset: string;    // Standardized cover asset URL or data URL
+    textureKey?: string;   // Phaser — atlas frame name (e.g. 'eff-fire')
 }
 
 // ===== Sigil =====
 // Discriminated union — kept as a type since interfaces can't express unions directly.
 // Each variant below is its own interface for clarity and reuse.
 
+export type SigilType = 'effector' | 'form' | 'position';
+
 export interface EffectorSigil extends SigilAssetRefs {
     id: string;
     label: string;
     type: 'effector';
+    sigilType?: 'effector';
     element: Element;
+    elementId?: string;
+    baseHitDamage?: number;
     tier: number;
     description: string;
 }
 
-export interface PositionAugmentorSigil extends SigilAssetRefs {
+export interface PositionSigil extends SigilAssetRefs {
     id: string;
     label: string;
     type: 'augmentor';
+    sigilType?: 'position';
     augmentorType: 'position';
     tier: number;
     description: string;
-    // direction comes from which cardinal slot it's placed in — not a sigil property
 }
 
-export interface FormAugmentorSigil extends SigilAssetRefs {
+export interface FormSigil extends SigilAssetRefs {
     id: string;
     label: string;
     type: 'augmentor';
+    sigilType?: 'form';
     augmentorType: 'form';
     formType?: FormType;
     tier: number;
     description: string;
 }
 
-export type Sigil = EffectorSigil | PositionAugmentorSigil | FormAugmentorSigil;
+export type PositionAugmentorSigil = PositionSigil;
+export type FormAugmentorSigil = FormSigil;
+export type Sigil = EffectorSigil | PositionSigil | FormSigil;
+
+// ===== Stroke Data for custom drawn glyphs =====
+
+export interface StrokePoint {
+    x: number;
+    y: number;
+}
 
 // ===== Tier =====
 
@@ -77,30 +92,52 @@ export interface GlyphComposition {
         left?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number };
     };
     formAugmentors: {
-        topLeft?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number };
-        topRight?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number };
-        bottomLeft?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number };
-        bottomRight?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number };
+        topLeft?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number; formType?: FormType };
+        topRight?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number; formType?: FormType };
+        bottomLeft?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number; formType?: FormType };
+        bottomRight?: { sigilId?: string; label?: string; customCrop?: string; confidence?: number; formType?: FormType };
     };
-    strokes?: StrokePoint[] | any[];
+    forms?: string[];
+    /** Saved vector strokes for replay (Atrament StrokeData or raw StrokePoint arrays) */
+    strokes?: unknown[];
 }
+
+/** Alias for backwards-compatibility with legacy references */
+export type WorkshopGlyphComposition = GlyphComposition;
 
 export interface GlyphBase {
     id: string;
     userId?: string;
     name?: string;
     description?: string;
-    element?: Element;
+    element?: Element | string;
     tier: number;
     isPublic?: boolean;
     schemaId?: string;
+    /** Standardized asset reference URL (maps directly to Supabase cover_asset) */
+    coverAsset?: string;
     composition: GlyphComposition;
 }
 
+/**
+ * Canonical unified WorkshopGlyph representing a constructed, saved, or active spell glyph.
+ * Used consistently across Workshop catalog, Hotbar, Phaser gameplay, and Supabase database.
+ */
 export interface WorkshopGlyph extends GlyphBase {
-    ringClosed: boolean;    // toggles freely — preview only, never destructive
-    savedAt: string;
+    name: string;
+    description: string;
+    element: Element | string;
+    author?: string | null;
+    createdAt?: string;
+    savedAt?: string;
+    confidenceScore?: number;
+    ringClosed?: boolean;
+    isDraft?: boolean;
+    isUnsaved?: boolean;
 }
+
+/** Alias for backwards-compatibility with components importing WorkshopGlyphItem */
+export type WorkshopGlyphItem = WorkshopGlyph;
 
 export interface PvPGlyph extends GlyphBase {
     sourceGlyphId: string;   // traceability to the WorkshopGlyph it was copied from
@@ -137,11 +174,6 @@ export interface ActiveGlyphInstance {
 export interface SceneGlyphInventory {
     mode: ExecutionMode;
     instances: ActiveGlyphInstance[];
-}
-
-export interface StrokePoint {
-    x: number;
-    y: number;
 }
 
 export interface Stroke {

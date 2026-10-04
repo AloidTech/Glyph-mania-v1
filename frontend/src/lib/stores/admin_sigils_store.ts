@@ -4,19 +4,22 @@ import { AugmentorType, Element, FormType, SigilKind } from '../../types/glyph_t
 import { generateSigilId } from '../glyph_helpers/sigils';
 import { fetchRemoteSigils } from '../apis/api';
 import { generateUUID } from '../uuid';
+import { supabase } from '../supabase/supabase';
 
 export interface AdminSigilItem {
   id: string;
   label: string;
   type: SigilKind;
+  sigilType?: 'effector' | 'form' | 'position';  // NEW
   augmentorType?: AugmentorType;
   element?: Element;
+  elementId?: string;  // NEW: FK to elements table  
   formType?: FormType;
   tier: number;
   description: string;
   coverAsset: string; // SVG path, image URL, or data URL
-  svgPath?: string;
   textureKey?: string;
+  baseHitDamage?: number;  // NEW: per-sigil hit damage
   createdAt: number;
   updatedAt: number;
 }
@@ -34,6 +37,7 @@ export interface AdminSigilsState {
   deleteSigil: (id: string) => void;
   clearDraft: (id: string) => void; // call this after remote save
   getSigilById: (id: string) => AdminSigilItem | undefined;
+  getSigilByLabel: (label: string) => AdminSigilItem | undefined;
   resetToDefaults: () => void;
 }
 
@@ -233,6 +237,13 @@ export const useAdminSigilsStore = create<AdminSigilsState>()(
         return get().sigils.find((s) => s.id === id);
       },
 
+      getSigilByLabel: (label) => {
+        const query = label.trim().toLowerCase();
+        return get().sigils.find(
+          (s) => s.label.toLowerCase() === query || s.id.toLowerCase() === query
+        );
+      },
+
       resetToDefaults: () => {
         set({
           drafts: {},
@@ -262,3 +273,47 @@ export const useAdminSigilsStore = create<AdminSigilsState>()(
     }
   )
 );
+
+// ===== Supabase Realtime Subscription =====
+
+let sigilsRealtimeChannel: ReturnType<typeof supabase.channel> | null = null;
+
+/**
+ * Subscribes to Supabase realtime changes on the `sigils` table.
+ * On INSERT/UPDATE/DELETE, refetches the full sigil catalog and updates the store.
+ * Call once on app mount. Returns an unsubscribe function.
+ */
+export function subscribeToRealtimeSigils(): () => void {
+  if (sigilsRealtimeChannel) {
+    supabase.removeChannel(sigilsRealtimeChannel);
+  }
+
+  sigilsRealtimeChannel = supabase
+    .channel('sigils-realtime')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'sigils' },
+      async (payload) => {
+        console.log('[admin_sigils_store] Realtime sigils change:', payload.eventType);
+        try {
+          await useAdminSigilsStore.getState().loadRemoteSigils();
+        } catch (err) {
+          console.error('[admin_sigils_store] Failed to reload sigils after realtime event:', err);
+        }
+      }
+    )
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        console.log('[admin_sigils_store] Realtime sigils subscription active.');
+      } else if (status === 'CHANNEL_ERROR') {
+        console.error('[admin_sigils_store] Realtime sigils subscription error.');
+      }
+    });
+
+  return () => {
+    if (sigilsRealtimeChannel) {
+      supabase.removeChannel(sigilsRealtimeChannel);
+      sigilsRealtimeChannel = null;
+    }
+  };
+}

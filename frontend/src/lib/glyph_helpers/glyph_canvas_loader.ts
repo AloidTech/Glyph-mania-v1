@@ -10,7 +10,7 @@
 
 import type { StrokeData, StrokePoint } from 'atrament';
 import type { DrawingCanvasRef } from '../../components/DrawingCanvas';
-import type { WorkshopGlyphItem } from '../../components/WorkshopCatalogMenu/GlyphCard';
+import type { WorkshopGlyphItem, GlyphComposition } from '../../types/glyph_types';
 import type { AdminGlyphItem } from '../stores/admin_glyphs_store';
 
 // ---------------------------------------------------------------------------
@@ -265,14 +265,19 @@ export async function loadGlyphIntoCanvas(
     return false;
   }
 
-  const W = canvasEl.width || canvasEl.clientWidth || 500;
-  const H = canvasEl.height || canvasEl.clientHeight || 500;
+  const rect = canvasEl.getBoundingClientRect();
+  const parentRect = canvasEl.parentElement?.getBoundingClientRect();
+  const W = Math.round(rect.width || parentRect?.width || canvasEl.clientWidth || canvasEl.width || 500);
+  const H = Math.round(rect.height || parentRect?.height || canvasEl.clientHeight || canvasEl.height || 500);
+  if (canvasEl.width !== W || canvasEl.height !== H) {
+    canvasEl.width = W;
+    canvasEl.height = H;
+  }
 
   // --- Path 1: replay saved vector strokes ---
   let rawStrokes: StrokeData[] | undefined =
-    glyph.composition?.strokes ??
-    (glyph as any).strokes ??
-    (glyph.composition as any)?.rawStrokes;
+    (glyph.composition?.strokes as StrokeData[] | undefined) ??
+    (glyph.composition as GlyphComposition | undefined)?.strokes as StrokeData[] | undefined;
 
   // Fallback: check stores if strokes were not attached to the catalog item
   if (!rawStrokes || !Array.isArray(rawStrokes) || rawStrokes.length === 0) {
@@ -281,7 +286,7 @@ export async function loadGlyphIntoCanvas(
         const { useAdminGlyphsStore } = await import('../stores/admin_glyphs_store');
         const adminItem = useAdminGlyphsStore.getState().getGlyphById(glyph.id);
         if (adminItem?.composition?.strokes && adminItem.composition.strokes.length > 0) {
-          rawStrokes = adminItem.composition.strokes;
+          rawStrokes = adminItem.composition.strokes as StrokeData[];
         } else {
           const { useWorkshopDraftStore } = await import('../stores/workshop_draft_store');
           const wsDraft = useWorkshopDraftStore.getState().workshopDraft;
@@ -337,7 +342,7 @@ export async function loadGlyphIntoCanvas(
       });
     }
     if (typeof compDirs === 'object') {
-      return Boolean((compDirs as any)[card] || (compDirs as any)[alias]);
+      return Boolean(compDirs[card as keyof typeof compDirs] || compDirs[alias.toLowerCase() as keyof typeof compDirs]);
     }
     return true;
   };

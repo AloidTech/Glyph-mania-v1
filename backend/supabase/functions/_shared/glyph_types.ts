@@ -1,5 +1,6 @@
 // ===== Literal Types =====
 
+export type SigilType = 'effector' | 'form' | 'position';
 export type Element = 'fire' | 'water' | 'earth' | 'air';
 export type FormType = 'dash' | 'whirl' | 'condense' | 'compress';
 export type SigilKind = 'effector' | 'augmentor';
@@ -244,4 +245,23 @@ export interface CanvasSigilError {
   message: string;
   confidence?: number | null;
   bbox: BoundingBox;
+}
+
+export interface ElementItem {
+  id: string;
+  label: string;
+  primaryColor: string;
+  secondaryColor: string;
+  particleVfxKey: string;
+  baseHitDamage: number;
+}
+
+export interface ElementEffectItem {
+  id: number;
+  elementId: string;
+  effectType: string;
+  baseTickDamage: number;
+  intervalTicks: number;
+  durationTicks: number;
+  baseMagnitude: number | null;
 }

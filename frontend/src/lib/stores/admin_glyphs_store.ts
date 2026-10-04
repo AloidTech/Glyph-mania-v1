@@ -1,32 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Element } from '../../types/glyph_types';
+import { Element, GlyphComposition } from '../../types/glyph_types';
 import { fetchRemoteGlyphs } from '../apis/api';
 import { generateUUID } from '../uuid';
+import { supabase } from '../supabase/supabase';
 
 import type { StrokeData } from 'atrament';
 
-export interface AdminGlyphComposition {
-  effector?: {
-    sigilId?: string;
-    label?: string;
-    element?: Element;
-    customCrop?: string; // Data URL or asset path
-  };
-  directions: {
-    top?: { sigilId?: string; label?: string; customCrop?: string };
-    right?: { sigilId?: string; label?: string; customCrop?: string };
-    bottom?: { sigilId?: string; label?: string; customCrop?: string };
-    left?: { sigilId?: string; label?: string; customCrop?: string };
-  };
-  formAugmentors: {
-    topLeft?: { sigilId?: string; label?: string; customCrop?: string };
-    topRight?: { sigilId?: string; label?: string; customCrop?: string };
-    bottomLeft?: { sigilId?: string; label?: string; customCrop?: string };
-    bottomRight?: { sigilId?: string; label?: string; customCrop?: string };
-  };
-  strokes?: StrokeData[] | any[];
-}
+export type AdminGlyphComposition = GlyphComposition;
 
 export interface AdminGlyphItem {
   id: string;
@@ -88,7 +69,7 @@ export const useAdminGlyphsStore = create<AdminGlyphsState>()(
       setRemoteGlyphs: (remoteGlyphs) => {
         set((state) => ({
           remoteGlyphs,
-          glyphs: []
+          glyphs: computeMergedGlyphs(state.drafts, remoteGlyphs)
         }));
       },
 
@@ -196,3 +177,47 @@ export const useAdminGlyphsStore = create<AdminGlyphsState>()(
     }
   )
 );
+
+// ===== Supabase Realtime Subscription =====
+
+let glyphsRealtimeChannel: ReturnType<typeof supabase.channel> | null = null;
+
+/**
+ * Subscribes to Supabase realtime changes on the `glyphs` table.
+ * On INSERT/UPDATE/DELETE, refetches the full glyph catalog and updates the store.
+ * Call once on app mount. Returns an unsubscribe function.
+ */
+export function subscribeToRealtimeGlyphs(): () => void {
+  if (glyphsRealtimeChannel) {
+    supabase.removeChannel(glyphsRealtimeChannel);
+  }
+
+  glyphsRealtimeChannel = supabase
+    .channel('glyphs-realtime')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'glyphs' },
+      async (payload) => {
+        console.log('[admin_glyphs_store] Realtime glyphs change:', payload.eventType);
+        try {
+          await useAdminGlyphsStore.getState().loadRemoteGlyphs();
+        } catch (err) {
+          console.error('[admin_glyphs_store] Failed to reload glyphs after realtime event:', err);
+        }
+      }
+    )
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        console.log('[admin_glyphs_store] Realtime glyphs subscription active.');
+      } else if (status === 'CHANNEL_ERROR') {
+        console.error('[admin_glyphs_store] Realtime glyphs subscription error.');
+      }
+    });
+
+  return () => {
+    if (glyphsRealtimeChannel) {
+      supabase.removeChannel(glyphsRealtimeChannel);
+      glyphsRealtimeChannel = null;
+    }
+  };
+}

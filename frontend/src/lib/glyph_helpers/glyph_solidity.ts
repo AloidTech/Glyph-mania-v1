@@ -17,7 +17,7 @@ import type {
 } from '../../types/glyph_types';
 import type { AdminSigilItem } from '../stores/admin_sigils_store';
 import type { GlyphCompositionAnalysis } from '../ml/glyph_semantic_engine';
-import { resolveCanonicalSigil, FOUNDATIONAL_SIGILS } from './sigils';
+import { resolveCanonicalSigil } from './sigils';
 
 export interface SlotSolidityAnalysis {
   effector: boolean;
@@ -48,7 +48,7 @@ export type SlotAccuracies = Partial<{
 }> | Record<string, number>;
 
 export interface SlotErrorDetail {
-  type: 'low_accuracy' | 'type_mismatch' | 'form_mismatch' | 'unrecognized' | 'missing';
+  type: 'low_accuracy' | 'type_mismatch' | 'form_mismatch' | 'unrecognized' | 'missing' | 'cardinal_too_short';
   message: string;
 }
 
@@ -114,8 +114,20 @@ export function analyzeSolidity(
   }
 
   // If saved vector strokes are present in the composition, the glyph was already drawn
-  // and verified by the player — treat it as solid without re-running slot validation.
-  if (Array.isArray((comp as any).strokes) && (comp as any).strokes.length > 0) {
+  // and verified by the player — treat it as solid without re-running slot validation if element is present.
+  if (Array.isArray(comp.strokes) && comp.strokes.length > 0) {
+    const hasElement = Boolean(glyph.element || comp.effector?.element);
+    if (!hasElement) {
+      return {
+        isSolid: false,
+        slots,
+        reasons: ['Glyph must have a valid elemental affinity'],
+        formType: null,
+        lowAccuracySlots,
+        accuracies: recordedAccuracies,
+        slotErrors,
+      };
+    }
     const allSlotsTrue: SlotSolidityAnalysis = {
       effector: true,
       directions: { top: true, right: true, bottom: true, left: true },
@@ -146,12 +158,19 @@ export function analyzeSolidity(
     if (!effectorSigil) {
       reasons.push(`Unknown effector sigil: ${comp.effector.sigilId}`);
       addSlotError('effector', 'type_mismatch', `Unknown effector sigil: ${comp.effector.sigilId}`);
-    } else if (effectorSigil.type !== 'effector') {
-      reasons.push(`Sigil in center is not an effector (type: ${effectorSigil.type})`);
+    } else if (effectorSigil.type !== 'effector' && effectorSigil.sigilType !== 'effector') {
+      reasons.push(`Sigil in center is not an effector (type: ${effectorSigil.sigilType || effectorSigil.type})`);
       addSlotError(
         'effector',
         'type_mismatch',
-        `Center requires an Effector sigil, but found ${effectorSigil.type}.`
+        `Center requires an Effector sigil, but found ${effectorSigil.sigilType || effectorSigil.type}.`
+      );
+    } else if (!effectorSigil.element && !(effectorSigil as any).elementId && !comp.effector.element && !glyph.element) {
+      reasons.push('Effector must specify a valid elemental affinity');
+      addSlotError(
+        'effector',
+        'type_mismatch',
+        'Effector has no assigned element.'
       );
     } else {
       slots.effector = true;
@@ -190,12 +209,13 @@ export function analyzeSolidity(
       continue;
     }
 
-    if (sigil.type !== 'augmentor' || sigil.augmentorType !== 'position') {
+    const isPositionSigil = sigil.sigilType === 'position' || (sigil.type === 'augmentor' && sigil.augmentorType === 'position');
+    if (!isPositionSigil) {
       reasons.push(`Sigil in ${dir} is not a position augmentor`);
       addSlotError(
         dir,
         'type_mismatch',
-        `Position anchor requires a Direction sigil, but found ${sigil.type}.`
+        `Position anchor requires a Direction sigil, but found ${sigil.sigilType || sigil.type}.`
       );
       continue;
     }
@@ -203,7 +223,7 @@ export function analyzeSolidity(
     slots.directions[dir] = true;
 
     // Check Direction Accuracy
-    const dirConf = (accuracies as any)?.[dir] ?? slot.confidence;
+    const dirConf = (accuracies as Record<string, number>)?.[dir] ?? slot.confidence;
     if (dirConf !== undefined && dirConf !== null) {
       recordedAccuracies[dir] = dirConf;
       if (dirConf < (ACCURACY_THRESHOLD - 0.10)) {
@@ -239,9 +259,10 @@ export function analyzeSolidity(
       continue;
     }
 
-    if (sigil.type !== 'augmentor' || sigil.augmentorType !== 'form') {
+    const isFormSigil = sigil.sigilType === 'form' || (sigil.type === 'augmentor' && sigil.augmentorType === 'form');
+    if (!isFormSigil) {
       reasons.push(`Sigil in ${f} is not a form augmentor`);
-      addSlotError(f, 'type_mismatch', `Form slot requires a Form augmentor, but found ${sigil.type}.`);
+      addSlotError(f, 'type_mismatch', `Form slot requires a Form augmentor, but found ${sigil.sigilType || sigil.type}.`);
       continue;
     }
 
@@ -269,7 +290,7 @@ export function analyzeSolidity(
     slots.formAugmentors[f] = true;
 
     // Check Form Accuracy
-    const formConf = (accuracies as any)?.[f] ?? slot.confidence;
+    const formConf = (accuracies as Record<string, number>)?.[f] ?? slot.confidence;
     if (formConf !== undefined && formConf !== null) {
       recordedAccuracies[f] = formConf;
       if (formConf < ACCURACY_THRESHOLD) {
@@ -322,8 +343,8 @@ export function isSolid(
  * Universal Sigil ID resolver that maps labels, aliases, and cardinal symbols to canonical IDs.
  */
 export function defaultResolveSigilId(
-  label?: string | null,
-  sigils?: (Sigil | AdminSigilItem)[]
+  label: string | null | undefined,
+  sigils: (Sigil | AdminSigilItem)[]
 ): string | undefined {
   if (!label) return undefined;
   const resolved = resolveCanonicalSigil(label, sigils);
@@ -340,7 +361,7 @@ export function buildCompositionFromAnalysis(
 ): GlyphComposition {
   return {
     effector: {
-      sigilId: resolveSigilId(analysis.semanticCrops.effector?.recognition.label),
+      sigilId: analysis.semanticCrops.effector?.recognition.sigilId || resolveSigilId(analysis.semanticCrops.effector?.recognition.label),
       label: analysis.semanticCrops.effector?.recognition.label || undefined,
       element,
       confidence: analysis.semanticCrops.effector?.recognition.confidence ?? undefined,
@@ -349,7 +370,7 @@ export function buildCompositionFromAnalysis(
     directions: {
       top: analysis.semanticCrops.top?.dataUrl
         ? {
-          sigilId: resolveSigilId(analysis.semanticCrops.top.recognition.label || 'Position'),
+          sigilId: analysis.semanticCrops.top.recognition.sigilId || resolveSigilId(analysis.semanticCrops.top.recognition.label || 'Position'),
           label: analysis.semanticCrops.top.recognition.label || 'Position',
           confidence: analysis.semanticCrops.top.recognition.confidence ?? 0.88,
           customCrop: analysis.semanticCrops.top.dataUrl,
@@ -357,7 +378,7 @@ export function buildCompositionFromAnalysis(
         : undefined,
       right: analysis.semanticCrops.right?.dataUrl
         ? {
-          sigilId: resolveSigilId(analysis.semanticCrops.right.recognition.label || 'Position'),
+          sigilId: analysis.semanticCrops.right.recognition.sigilId || resolveSigilId(analysis.semanticCrops.right.recognition.label || 'Position'),
           label: analysis.semanticCrops.right.recognition.label || 'Position',
           confidence: analysis.semanticCrops.right.recognition.confidence ?? 0.88,
           customCrop: analysis.semanticCrops.right.dataUrl,
@@ -365,7 +386,7 @@ export function buildCompositionFromAnalysis(
         : undefined,
       bottom: analysis.semanticCrops.bottom?.dataUrl
         ? {
-          sigilId: resolveSigilId(analysis.semanticCrops.bottom.recognition.label || 'Position'),
+          sigilId: analysis.semanticCrops.bottom.recognition.sigilId || resolveSigilId(analysis.semanticCrops.bottom.recognition.label || 'Position'),
           label: analysis.semanticCrops.bottom.recognition.label || 'Position',
           confidence: analysis.semanticCrops.bottom.recognition.confidence ?? 0.88,
           customCrop: analysis.semanticCrops.bottom.dataUrl,
@@ -373,7 +394,7 @@ export function buildCompositionFromAnalysis(
         : undefined,
       left: analysis.semanticCrops.left?.dataUrl
         ? {
-          sigilId: resolveSigilId(analysis.semanticCrops.left.recognition.label || 'Position'),
+          sigilId: analysis.semanticCrops.left.recognition.sigilId || resolveSigilId(analysis.semanticCrops.left.recognition.label || 'Position'),
           label: analysis.semanticCrops.left.recognition.label || 'Position',
           confidence: analysis.semanticCrops.left.recognition.confidence ?? 0.88,
           customCrop: analysis.semanticCrops.left.dataUrl,
@@ -383,7 +404,7 @@ export function buildCompositionFromAnalysis(
     formAugmentors: {
       topLeft: analysis.semanticCrops.topLeft?.dataUrl
         ? {
-          sigilId: resolveSigilId(analysis.semanticCrops.topLeft.recognition.label),
+          sigilId: analysis.semanticCrops.topLeft.recognition.sigilId || resolveSigilId(analysis.semanticCrops.topLeft.recognition.label),
           label: analysis.semanticCrops.topLeft.recognition.label || 'Form Augmentor',
           confidence: analysis.semanticCrops.topLeft.recognition.confidence ?? undefined,
           customCrop: analysis.semanticCrops.topLeft.dataUrl,
@@ -391,7 +412,7 @@ export function buildCompositionFromAnalysis(
         : undefined,
       topRight: analysis.semanticCrops.topRight?.dataUrl
         ? {
-          sigilId: resolveSigilId(analysis.semanticCrops.topRight.recognition.label),
+          sigilId: analysis.semanticCrops.topRight.recognition.sigilId || resolveSigilId(analysis.semanticCrops.topRight.recognition.label),
           label: analysis.semanticCrops.topRight.recognition.label || 'Form Augmentor',
           confidence: analysis.semanticCrops.topRight.recognition.confidence ?? undefined,
           customCrop: analysis.semanticCrops.topRight.dataUrl,
@@ -399,7 +420,7 @@ export function buildCompositionFromAnalysis(
         : undefined,
       bottomLeft: analysis.semanticCrops.bottomLeft?.dataUrl
         ? {
-          sigilId: resolveSigilId(analysis.semanticCrops.bottomLeft.recognition.label),
+          sigilId: analysis.semanticCrops.bottomLeft.recognition.sigilId || resolveSigilId(analysis.semanticCrops.bottomLeft.recognition.label),
           label: analysis.semanticCrops.bottomLeft.recognition.label || 'Form Augmentor',
           confidence: analysis.semanticCrops.bottomLeft.recognition.confidence ?? undefined,
           customCrop: analysis.semanticCrops.bottomLeft.dataUrl,
@@ -407,7 +428,7 @@ export function buildCompositionFromAnalysis(
         : undefined,
       bottomRight: analysis.semanticCrops.bottomRight?.dataUrl
         ? {
-          sigilId: resolveSigilId(analysis.semanticCrops.bottomRight.recognition.label),
+          sigilId: analysis.semanticCrops.bottomRight.recognition.sigilId || resolveSigilId(analysis.semanticCrops.bottomRight.recognition.label),
           label: analysis.semanticCrops.bottomRight.recognition.label || 'Form Augmentor',
           confidence: analysis.semanticCrops.bottomRight.recognition.confidence ?? undefined,
           customCrop: analysis.semanticCrops.bottomRight.dataUrl,
@@ -460,6 +481,7 @@ export function checkSolidityFromAnalysis(
       id: 'preview',
       tier: opts?.tier ?? 1,
       composition: comp,
+      element: opts?.element,
     },
     sigils,
     accuracies
@@ -470,7 +492,7 @@ export interface CanvasSigilError {
   key: string;
   title: string;
   label: string;
-  errorType: 'low_accuracy' | 'type_mismatch' | 'form_mismatch' | 'unrecognized' | 'missing' | 'invalid';
+  errorType: 'low_accuracy' | 'type_mismatch' | 'form_mismatch' | 'unrecognized' | 'missing' | 'cardinal_too_short' | 'invalid';
   message: string;
   confidence?: number | null;
   bbox: { x: number; y: number; width: number; height: number };
@@ -540,7 +562,23 @@ export function getCanvasSigilErrors(
     }
   }
 
-  // 2. Directions
+  // 2. Directions & Cardinal Length Proportionality Check
+  const effBBox = analysis.effectorBBox || (analysis.spatial?.effectorComponents?.length ? unionBBox(analysis.spatial.effectorComponents.map((c) => c.bbox)) : null);
+  const effSpan = effBBox ? Math.max(effBBox.width, effBBox.height) : 0;
+
+  const formKeys = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'] as const;
+  const missingForms = formKeys.filter((f) => {
+    const comps = analysis.spatial?.forms?.[f];
+    return !comps || comps.length === 0;
+  });
+
+  const adjacentForms: Record<'top' | 'right' | 'bottom' | 'left', (typeof formKeys)[number][]> = {
+    top: ['topLeft', 'topRight'],
+    bottom: ['bottomLeft', 'bottomRight'],
+    left: ['topLeft', 'bottomLeft'],
+    right: ['topRight', 'bottomRight'],
+  };
+
   const dirKeys = ['top', 'right', 'bottom', 'left'] as const;
   for (const d of dirKeys) {
     const crop = analysis.spatial?.directions?.[d];
@@ -550,12 +588,29 @@ export function getCanvasSigilErrors(
       if (err) {
         err.bbox = crop.bbox;
         results.push(err);
+      } else if (effSpan >= 30) {
+        // Check if cardinal arrow is too short relative to the central effector
+        const arrowLength = (d === 'top' || d === 'bottom') ? crop.bbox.height : crop.bbox.width;
+        const hasMissingAdjacentForm = adjacentForms[d].some((f) => missingForms.includes(f));
+        // Cardinal arrow length threshold: < 45% of effector span
+        const isTooShort = arrowLength < effSpan * 0.45;
+
+        if (isTooShort && hasMissingAdjacentForm) {
+          results.push({
+            key: `${d}-too-short`,
+            title,
+            label: 'Anchor Too Short',
+            errorType: 'cardinal_too_short',
+            message: `${title} arrow is too short (${Math.round(arrowLength)}px vs ${Math.round(effSpan)}px effector). Extend it closer to the center to frame the missing corner form.`,
+            confidence: null,
+            bbox: crop.bbox,
+          });
+        }
       }
     }
   }
 
   // 3. Forms
-  const formKeys = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'] as const;
   for (const f of formKeys) {
     const comps = analysis.spatial?.forms?.[f];
     if (comps && comps.length > 0) {

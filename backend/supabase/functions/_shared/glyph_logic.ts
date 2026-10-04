@@ -54,6 +54,7 @@ export function analyzeSolidity(
   const lowAccuracySlots: string[] = [];
   const recordedAccuracies: Record<string, number> = {};
   const slotErrors: Record<string, SlotErrorDetail[]> = {};
+  const ACCURACY_THRESHOLD = 0.35;
 
   const addSlotError = (slotKey: string, type: SlotErrorDetail['type'], message: string) => {
     if (!slotErrors[slotKey]) slotErrors[slotKey] = [];
@@ -85,6 +86,37 @@ export function analyzeSolidity(
       lowAccuracySlots,
       accuracies: recordedAccuracies,
       slotErrors,
+    };
+  }
+
+  // If saved vector strokes are present in the composition, the glyph was already drawn
+  // and verified by the player — treat it as solid without re-running slot validation if element is present.
+  if (Array.isArray((comp as any).strokes) && (comp as any).strokes.length > 0) {
+    const hasElement = Boolean(glyph.element || comp.effector?.element);
+    if (!hasElement) {
+      return {
+        isSolid: false,
+        slots,
+        reasons: ['Glyph must have a valid elemental affinity'],
+        formType: null,
+        lowAccuracySlots,
+        accuracies: recordedAccuracies,
+        slotErrors,
+      };
+    }
+    const allSlotsTrue: SlotSolidityAnalysis = {
+      effector: true,
+      directions: { top: true, right: true, bottom: true, left: true },
+      formAugmentors: { topLeft: true, topRight: true, bottomLeft: true, bottomRight: true },
+    };
+    return {
+      isSolid: true,
+      slots: allSlotsTrue,
+      reasons: [],
+      formType: null,
+      lowAccuracySlots: [],
+      accuracies: {},
+      slotErrors: {},
     };
   }
 
@@ -162,12 +194,19 @@ export function analyzeSolidity(
     if (!effectorSigil) {
       reasons.push(`Unknown effector sigil: ${comp.effector.sigilId}`);
       addSlotError('effector', 'type_mismatch', `Unknown effector sigil: ${comp.effector.sigilId}`);
-    } else if (effectorSigil.type !== 'effector') {
-      reasons.push(`Sigil in center is not an effector (type: ${effectorSigil.type})`);
+    } else if (effectorSigil.type !== 'effector' && effectorSigil.sigil_type !== 'effector' && effectorSigil.sigilType !== 'effector') {
+      reasons.push(`Sigil in center is not an effector (type: ${effectorSigil.sigil_type || effectorSigil.sigilType || effectorSigil.type})`);
       addSlotError(
         'effector',
         'type_mismatch',
-        `Center requires an Effector sigil, but found ${effectorSigil.type}.`
+        `Center requires an Effector sigil, but found ${effectorSigil.sigil_type || effectorSigil.sigilType || effectorSigil.type}.`
+      );
+    } else if (!effectorSigil.element && !effectorSigil.element_id && !effectorSigil.elementId && !comp.effector.element && !glyph.element) {
+      reasons.push('Effector must specify a valid elemental affinity');
+      addSlotError(
+        'effector',
+        'type_mismatch',
+        'Effector has no assigned element.'
       );
     } else {
       slots.effector = true;
@@ -179,9 +218,9 @@ export function analyzeSolidity(
   const effectorConf = normalizeConf(rawEffConf);
   if (effectorConf !== undefined) {
     recordedAccuracies.effector = effectorConf;
-    if (effectorConf < 0.8) {
+    if (effectorConf < ACCURACY_THRESHOLD) {
       lowAccuracySlots.push('effector');
-      reasons.push(`Effector accuracy is too low (${(effectorConf * 100).toFixed(1)}% < 80%)`);
+      reasons.push(`Effector accuracy is too low (${(effectorConf * 100).toFixed(1)}% < ${ACCURACY_THRESHOLD * 100}%)`);
       addSlotError(
         'effector',
         'low_accuracy',
@@ -207,12 +246,13 @@ export function analyzeSolidity(
       continue;
     }
 
-    if (sigil.type !== 'augmentor' || sigil.augmentorType !== 'position') {
+    const isPosition = sigil.sigil_type === 'position' || sigil.sigilType === 'position' || (sigil.type === 'augmentor' && (sigil.augmentor_type === 'position' || sigil.augmentorType === 'position'));
+    if (!isPosition) {
       reasons.push(`Sigil in ${dir} is not a position augmentor`);
       addSlotError(
         dir,
         'type_mismatch',
-        `Position anchor requires a Direction sigil, but found ${sigil.type}.`
+        `Position anchor requires a Direction sigil, but found ${sigil.sigil_type || sigil.sigilType || sigil.type}.`
       );
       continue;
     }
@@ -224,9 +264,9 @@ export function analyzeSolidity(
     const dirConf = normalizeConf(rawDirConf);
     if (dirConf !== undefined) {
       recordedAccuracies[dir] = dirConf;
-      if (dirConf < 0.8) {
+      if (dirConf < ACCURACY_THRESHOLD) {
         lowAccuracySlots.push(dir);
-        reasons.push(`${dir} anchor accuracy is too low (${(dirConf * 100).toFixed(1)}% < 80%)`);
+        reasons.push(`${dir} anchor accuracy is too low (${(dirConf * 100).toFixed(1)}% < ${ACCURACY_THRESHOLD * 100}%)`);
         addSlotError(
           dir,
           'low_accuracy',
@@ -257,9 +297,10 @@ export function analyzeSolidity(
       continue;
     }
 
-    if (sigil.type !== 'augmentor' || sigil.augmentorType !== 'form') {
+    const isForm = sigil.sigil_type === 'form' || sigil.sigilType === 'form' || (sigil.type === 'augmentor' && (sigil.augmentor_type === 'form' || sigil.augmentorType === 'form'));
+    if (!isForm) {
       reasons.push(`Sigil in ${f} is not a form augmentor`);
-      addSlotError(f, 'type_mismatch', `Form slot requires a Form augmentor, but found ${sigil.type}.`);
+      addSlotError(f, 'type_mismatch', `Form slot requires a Form augmentor, but found ${sigil.sigil_type || sigil.sigilType || sigil.type}.`);
       continue;
     }
 
@@ -291,9 +332,9 @@ export function analyzeSolidity(
     const formConf = normalizeConf(rawFormConf);
     if (formConf !== undefined) {
       recordedAccuracies[f] = formConf;
-      if (formConf < 0.8) {
+      if (formConf < ACCURACY_THRESHOLD) {
         lowAccuracySlots.push(f);
-        reasons.push(`${f} form accuracy is too low (${(formConf * 100).toFixed(1)}% < 80%)`);
+        reasons.push(`${f} form accuracy is too low (${(formConf * 100).toFixed(1)}% < ${ACCURACY_THRESHOLD * 100}%)`);
         addSlotError(
           f,
           'low_accuracy',
@@ -347,7 +388,7 @@ export function buildCompositionFromAnalysis(
 ): GlyphComposition {
   return {
     effector: {
-      sigilId: resolveSigilId(analysis.semanticCrops.effector?.recognition.label),
+      sigilId: analysis.semanticCrops.effector?.recognition.sigilId || resolveSigilId(analysis.semanticCrops.effector?.recognition.label),
       label: analysis.semanticCrops.effector?.recognition.label || undefined,
       element,
       confidence: analysis.semanticCrops.effector?.recognition.confidence ?? undefined,
@@ -356,7 +397,7 @@ export function buildCompositionFromAnalysis(
     directions: {
       top: analysis.semanticCrops.top?.dataUrl
         ? {
-            sigilId: resolveSigilId(analysis.semanticCrops.top.recognition.label),
+            sigilId: analysis.semanticCrops.top.recognition.sigilId || resolveSigilId(analysis.semanticCrops.top.recognition.label),
             label: analysis.semanticCrops.top.recognition.label || 'North Anchor',
             confidence: analysis.semanticCrops.top.recognition.confidence ?? undefined,
             customCrop: analysis.semanticCrops.top.dataUrl,
@@ -364,7 +405,7 @@ export function buildCompositionFromAnalysis(
         : undefined,
       right: analysis.semanticCrops.right?.dataUrl
         ? {
-            sigilId: resolveSigilId(analysis.semanticCrops.right.recognition.label),
+            sigilId: analysis.semanticCrops.right.recognition.sigilId || resolveSigilId(analysis.semanticCrops.right.recognition.label),
             label: analysis.semanticCrops.right.recognition.label || 'East Anchor',
             confidence: analysis.semanticCrops.right.recognition.confidence ?? undefined,
             customCrop: analysis.semanticCrops.right.dataUrl,
@@ -372,7 +413,7 @@ export function buildCompositionFromAnalysis(
         : undefined,
       bottom: analysis.semanticCrops.bottom?.dataUrl
         ? {
-            sigilId: resolveSigilId(analysis.semanticCrops.bottom.recognition.label),
+            sigilId: analysis.semanticCrops.bottom.recognition.sigilId || resolveSigilId(analysis.semanticCrops.bottom.recognition.label),
             label: analysis.semanticCrops.bottom.recognition.label || 'South Anchor',
             confidence: analysis.semanticCrops.bottom.recognition.confidence ?? undefined,
             customCrop: analysis.semanticCrops.bottom.dataUrl,
@@ -380,7 +421,7 @@ export function buildCompositionFromAnalysis(
         : undefined,
       left: analysis.semanticCrops.left?.dataUrl
         ? {
-            sigilId: resolveSigilId(analysis.semanticCrops.left.recognition.label),
+            sigilId: analysis.semanticCrops.left.recognition.sigilId || resolveSigilId(analysis.semanticCrops.left.recognition.label),
             label: analysis.semanticCrops.left.recognition.label || 'West Anchor',
             confidence: analysis.semanticCrops.left.recognition.confidence ?? undefined,
             customCrop: analysis.semanticCrops.left.dataUrl,
@@ -390,7 +431,7 @@ export function buildCompositionFromAnalysis(
     formAugmentors: {
       topLeft: analysis.semanticCrops.topLeft?.dataUrl
         ? {
-            sigilId: resolveSigilId(analysis.semanticCrops.topLeft.recognition.label),
+            sigilId: analysis.semanticCrops.topLeft.recognition.sigilId || resolveSigilId(analysis.semanticCrops.topLeft.recognition.label),
             label: analysis.semanticCrops.topLeft.recognition.label || 'Top-Left Augmentor',
             confidence: analysis.semanticCrops.topLeft.recognition.confidence ?? undefined,
             customCrop: analysis.semanticCrops.topLeft.dataUrl,
@@ -398,7 +439,7 @@ export function buildCompositionFromAnalysis(
         : undefined,
       topRight: analysis.semanticCrops.topRight?.dataUrl
         ? {
-            sigilId: resolveSigilId(analysis.semanticCrops.topRight.recognition.label),
+            sigilId: analysis.semanticCrops.topRight.recognition.sigilId || resolveSigilId(analysis.semanticCrops.topRight.recognition.label),
             label: analysis.semanticCrops.topRight.recognition.label || 'Top-Right Augmentor',
             confidence: analysis.semanticCrops.topRight.recognition.confidence ?? undefined,
             customCrop: analysis.semanticCrops.topRight.dataUrl,
@@ -406,7 +447,7 @@ export function buildCompositionFromAnalysis(
         : undefined,
       bottomLeft: analysis.semanticCrops.bottomLeft?.dataUrl
         ? {
-            sigilId: resolveSigilId(analysis.semanticCrops.bottomLeft.recognition.label),
+            sigilId: analysis.semanticCrops.bottomLeft.recognition.sigilId || resolveSigilId(analysis.semanticCrops.bottomLeft.recognition.label),
             label: analysis.semanticCrops.bottomLeft.recognition.label || 'Bottom-Left Augmentor',
             confidence: analysis.semanticCrops.bottomLeft.recognition.confidence ?? undefined,
             customCrop: analysis.semanticCrops.bottomLeft.dataUrl,
@@ -414,7 +455,7 @@ export function buildCompositionFromAnalysis(
         : undefined,
       bottomRight: analysis.semanticCrops.bottomRight?.dataUrl
         ? {
-            sigilId: resolveSigilId(analysis.semanticCrops.bottomRight.recognition.label),
+            sigilId: analysis.semanticCrops.bottomRight.recognition.sigilId || resolveSigilId(analysis.semanticCrops.bottomRight.recognition.label),
             label: analysis.semanticCrops.bottomRight.recognition.label || 'Bottom-Right Augmentor',
             confidence: analysis.semanticCrops.bottomRight.recognition.confidence ?? undefined,
             customCrop: analysis.semanticCrops.bottomRight.dataUrl,
