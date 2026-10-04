@@ -5,7 +5,7 @@ import { AmbientGlyph } from '../BackgroundElements/AmbientGlyph';
 import { CornerSigil } from '../BackgroundElements/CornerSigil';
 import { RuneDivider } from '../BackgroundElements/RuneDivider';
 import { HeaderOrnament } from '../BackgroundElements/HeaderOrnament';
-import { ProfileDropdown } from '../Dropdowns/ProfileDropdown';
+import { CharacterRotatingStand } from './CharacterRotatingStand';
 import { useAuth } from '../../lib/supabase/auth/useAuth';
 
 export const MainMenuUi: React.FC = () => {
@@ -65,9 +65,6 @@ export const MainMenuUi: React.FC = () => {
             Settings
           </button>
 
-
-
-
           <button
             onClick={() => {
               if (window.confirm('Exit Glyph Mania?')) {
@@ -84,8 +81,8 @@ export const MainMenuUi: React.FC = () => {
         <p className="main-menu-version">v0.1.0 — EARLY ACCESS</p>
       </div>
 
-      {/* Profile Dropdown in bottom-left */}
-      <ProfileDropdown />
+      {/* Character Rotating Stand HUD (Replacing Profile Icon button) */}
+      <CharacterRotatingStand />
     </div>
   );
 };
