@@ -7,7 +7,7 @@ import {
   FadersIcon,
   DesktopIcon,
 } from '@phosphor-icons/react';
-import { useGameStore } from '../lib/store';
+import { useGameStore } from '../lib/stores/store';
 
 export const SettingsModal: React.FC = () => {
   const setScreen = useGameStore((state) => state.setScreen);
@@ -18,10 +18,10 @@ export const SettingsModal: React.FC = () => {
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
+      document.documentElement.requestFullscreen().catch(() => { });
     } else {
       if (document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
+        document.exitFullscreen().catch(() => { });
       }
     }
   };
