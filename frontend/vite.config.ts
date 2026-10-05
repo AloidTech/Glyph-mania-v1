@@ -15,4 +15,19 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    outDir: 'dist',
+    chunkSizeWarningLimit: 2500,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          phaser: ['phaser'],
+          tensorflow: ['@tensorflow/tfjs'],
+          reactVendor: ['react', 'react-dom', 'react-router-dom'],
+          uiIcons: ['@phosphor-icons/react', 'react-icons'],
+          supabase: ['@supabase/supabase-js'],
+        },
+      },
+    },
+  },
 });
